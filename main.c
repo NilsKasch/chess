@@ -112,6 +112,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
         return best;
     }
     for (int i = 8 - white*8 ; i < 24 - white*8 ; i++) {
+        //printf("%d\n",i);
         if (pieces[i].value < 0){
             continue;
         }
@@ -121,6 +122,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 tmp.x=0;
                 tmp.y=1*white;
                 tmp.piece=i;
+                //printf("ok.%c%d%d\n",pieces[tmp.piece].txt, tmp.x, tmp.y);
                 tmp = next(-white,pieces, grid, tmp, depth - 1); //clacul value
                 tmp.x=0;
                 tmp.y=1*white;
@@ -196,12 +198,15 @@ int main (int argc, char *argv[]){
     
     Move move = {0,0,0,0};
     Piece undo_piece = {}; //useless here
+    char lettre;
+    short white=1;
     //main loop
     for (int i = 1; i < 4; i++) {
+        move = next(white,pieces,grid,move,2);
         apply_move(pieces,grid,&move, &undo_piece);
-        update_grid(pieces,grid);
-        move = next(1,pieces,grid,move,2);
-        printf("%d.%c%d%d\n",i,pieces[move.piece].txt, move.x, move.y);
+        lettre = 'a' + pieces[move.piece].x+move.x;
+        printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
+        white=-white;
     }
     
     return 0;
