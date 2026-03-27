@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef struct {
     char txt;
@@ -155,14 +156,29 @@ void plot_grid(Piece *pieces, int grid[]){
 }
 
 int main (int argc, char *argv[]){
-    if (argc == 2)
+    int n,d;
+    if (argc == 3)
     {
-        printf("%s\n", argv[1]);
+        char *end;
+        n = strtol(argv[1], &end, 10);
+        if (*end != '\0') {
+            printf("Error: not a valid number\n");
+            return 1;
+        }
+        d = strtol(argv[2], &end, 10);
+        if (*end != '\0') {
+            printf("Error: not a valid number\n");
+            return 1;
+        }
+        //printf("steps: %s\n", argv[1]);
+        //printf("depth: %s\n", argv[2]);
+        printf("steps: %d\n", n);
+        printf("depth: %d\n", d);
     }
     else
     {
         printf("Usage :\n");
-        printf("%s <number of steps>\n", argv[0]);
+        printf("%s <number of steps> <depth>\n", argv[0]);
         return 1;
     }
 
@@ -207,21 +223,21 @@ int main (int argc, char *argv[]){
     }
     
     printf("start\n");
-    printf("eval: %f\n",eval(pieces));
+    //printf("eval: %f\n",eval(pieces));
     update_grid(pieces,grid);
     /*
     for (int i = 0; i < 64; i++) {
         printf("grid: %d\n",grid[i]);
     }
     */
-    
+
     Move move = {0,0,0,0};
     Piece undo_piece = {}; //useless here
     char lettre;
     short white=1;
     //main loop
-    for (int i = 1; i < 4; i++) {
-        move = next(white,pieces,grid,move,2);
+    for (int i = 1; i <= n; i++) {
+        move = next(white,pieces,grid,move,d);
         lettre = 'a' + pieces[move.piece].x+move.x;
         //printf("bare move: %c%d%d\n",pieces[move.piece].txt, move.x, move.y);
         printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
