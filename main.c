@@ -39,29 +39,35 @@ void update_grid(Piece *pieces, int grid[]){
 }
 
 void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
-    int target=grid[(pieces[move->piece].x+(move->x))+(pieces[move->piece].y+(move->y))*8];
-    if (target!=32){
-        undo_piece->txt = pieces[target].txt;
-        undo_piece->value = pieces[target].value;
-        undo_piece->x = target;
-        undo_piece->y = target;
-        pieces[target].value=-1;
+    if (move->x != 0 && move->y != 0) //safeguard
+    {
+        int target=grid[(pieces[move->piece].x+(move->x))+(pieces[move->piece].y+(move->y))*8];
+        if (target!=32){
+            undo_piece->txt = pieces[target].txt;
+            undo_piece->value = pieces[target].value;
+            undo_piece->x = target;
+            undo_piece->y = target;
+            pieces[target].value=-1;
+        }
+        pieces[move->piece].x += move->x;
+        pieces[move->piece].y += move->y;
+        update_grid(pieces, grid);
     }
-    pieces[move->piece].x += move->x;
-    pieces[move->piece].y += move->y;
-    update_grid(pieces, grid);
 }
 
 void undo_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
-    if (undo_piece->value > 0){
-        pieces[undo_piece->x].txt = undo_piece->txt;
-        pieces[undo_piece->x].value = undo_piece->value;
-        pieces[undo_piece->x].x = pieces[move->piece].x;
-        pieces[undo_piece->x].y = pieces[move->piece].y;
+    if (move->x != 0 && move->y != 0) //safeguard
+    {
+        if (undo_piece->value > 0){
+            pieces[undo_piece->x].txt = undo_piece->txt;
+            pieces[undo_piece->x].value = undo_piece->value;
+            pieces[undo_piece->x].x = pieces[move->piece].x;
+            pieces[undo_piece->x].y = pieces[move->piece].y;
+        }
+        pieces[move->piece].x -= move->x;
+        pieces[move->piece].y -= move->y;
+        update_grid(pieces, grid);
     }
-    pieces[move->piece].x -= move->x;
-    pieces[move->piece].y -= move->y;
-    update_grid(pieces, grid);
 }
 
 void keep(Move *best, Move *tmp, short *white){
@@ -96,17 +102,13 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     Piece undo_piece = {};
     undo_piece.value=-1;
     best.value=-1000;
-    if (move.x != 0 && move.y != 0){
-        apply_move(pieces,grid,&move, &undo_piece);
-    }
+    apply_move(pieces,grid,&move, &undo_piece);
     if (depth == 0){
         best.piece=move.piece;
         best.x=move.x;
         best.y=move.y;
         best.value=eval(pieces);
-        if (move.x != 0 && move.y != 0){
-            undo_move(pieces,grid,&move, &undo_piece);
-        }
+        undo_move(pieces,grid,&move, &undo_piece);
         return best;
     }
     for (int i = 8 - white*8 ; i < 24 - white*8 ; i++) {
@@ -114,7 +116,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             continue;
         }
         if (pieces[i].txt == 'p'){
-            if (grid[pieces[i].x+(pieces[i].y+1*white)*8]!=32 && 0 <= pieces[i].y+1*white && pieces[i].y+1*white < 8){
+            if (grid[pieces[i].x+(pieces[i].y+1*white)*8]==32 && 0 <= pieces[i].y+1*white && pieces[i].y+1*white < 8){
                 //printf("ok\n");
                 tmp.x=0;
                 tmp.y=1*white;
@@ -127,9 +129,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
         }
     }
-    if (move.x != 0 && move.y != 0){
-        undo_move(pieces,grid,&move, &undo_piece);
-    }
+    undo_move(pieces,grid,&move, &undo_piece);
     return best;
 }
 
@@ -188,13 +188,18 @@ int main (int argc, char *argv[]){
     printf("start\n");
     printf("eval: %f\n",eval(pieces));
     update_grid(pieces,grid);
+    /*
     for (int i = 0; i < 64; i++) {
-        //printf("grid: %d\n",grid[i]);
+        printf("grid: %d\n",grid[i]);
     }
+    */
     
     Move move = {0,0,0,0};
+    Piece undo_piece = {}; //useless here
     //main loop
     for (int i = 1; i < 4; i++) {
+        apply_move(pieces,grid,&move, &undo_piece);
+        update_grid(pieces,grid);
         move = next(1,pieces,grid,move,2);
         printf("%d.%c%d%d\n",i,pieces[move.piece].txt, move.x, move.y);
     }
