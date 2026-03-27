@@ -6,6 +6,12 @@ typedef struct {
     int x,y;
 }Piece;
 
+typedef struct {
+    int piece;
+    int x,y;
+    float value;
+}Move;
+
 float eval(Piece *pieces){
     float sum=0;
     for (int i = 0; i < 16; i++) {
@@ -17,6 +23,90 @@ float eval(Piece *pieces){
         //printf("%d\n",i);
     }
     return sum;
+}
+
+void update_grid(Piece *pieces, int grid[]){
+    for (int i = 0; i < 64; i++) {
+        grid[i]=32;
+    }
+    for (int i = 0; i < 32; i++) {
+        if (pieces[i].value < 0){
+            continue;
+        }
+        grid[pieces[i].x+pieces[i].y*8]=i;
+    }
+}
+
+void apply_move(Piece *pieces, int grid[], Move *move){
+    if (grid[(pieces[move->piece].x+(move->x))+(pieces[move->piece].y+(move->y))*8]!=32){
+        pieces[grid[(pieces[move->piece].x+(move->x))+(pieces[move->piece].y+(move->y))*8]].value=-1;
+    }
+    pieces[move->piece].x += move->x;
+    pieces[move->piece].y += move->y;
+    update_grid(pieces, grid);
+}
+
+void keep(Move *best, Move *tmp, short *white){
+    if ((best->value)*(*white) < (tmp->value)*(*white))
+    {
+        best->value = tmp->value;
+        best->piece = tmp->piece;
+        best->x = tmp->x;
+        best->y = tmp->y;
+    }
+    else if ((best->value) == (tmp->value))
+    {
+        best->value = tmp->value;
+        best->piece = tmp->piece;
+        best->x = tmp->x;
+        best->y = tmp->y;
+    }
+}
+
+
+Move next(short white, Piece *pieces, int grid[], Move move, int depth){
+    /////// SEQ /////////
+    //prend en arg une grille et retourne la valeur du meilleur mouve trouvé et le meilleur move
+    //parcour chaques moves possibles:
+        // do move
+        // La valeur du move est la valeur retournée par next
+        // si la valeur est plus grande que celle des moves calculés on la stoque, et on supprime les autres.
+        // si la valeur est égale, on ajoute au tableau en vu de faire un move aléatoire
+        // undo move
+    Move best, tmp;
+    best.value=-1000;
+    if (depth == 0){
+        best.piece=move.piece;
+        best.x=move.x;
+        best.y=move.y;
+        best.value=eval_move(pieces,grid,move);
+        return best;
+    }
+    else{
+        apply_move(pieces,grid,&move);
+    }
+    for (int i = 8 - white*8 ; i < 24 - white*8 ; i++) {
+        if (pieces[i].value < 0){
+            continue;
+        }
+        if (pieces[i].txt == 'p'){
+            if (grid[pieces[i].x+(pieces[i].y+1*white)*8]!=32 && 0 <= pieces[i].y+1*white && pieces[i].y+1*white < 8){
+                tmp.x=0;
+                tmp.y=1*white;
+                tmp.piece=i;
+                tmp.value=0;
+                //apply_move
+                //pieces[i].y += 1*white;
+                //update_grid(pieces, grid);
+                tmp = next(white,pieces, grid, tmp, depth - 1);
+                keep(&best, &tmp, &white);
+                //undo_move
+                //pieces[i].y -= 1*white;
+                //update_grid(pieces, grid);
+            }
+        }
+    }
+    return best;
 }
 
 int main (int argc, char *argv[]){
@@ -32,42 +122,58 @@ int main (int argc, char *argv[]){
     }
 
     Piece pieces[32] = {
-        {'p',1,1,2},
-        {'p',1,2,2},
-        {'p',1,3,2},
-        {'p',1,4,2},
-        {'p',1,5,2},
-        {'p',1,6,2},
-        {'p',1,7,2},
-        {'p',1,8,2},
-        {'R',5,1,1},
-        {'R',5,8,1},
-        {'N',3,2,1},
-        {'N',3,7,1},
-        {'B',3,3,1},
-        {'B',3,6,1},
-        {'Q',9,4,1},
-        {'K',1000,5,1},
-        {'p',1,1,7},
-        {'p',1,2,7},
-        {'p',1,3,7},
-        {'p',1,4,7},
-        {'p',1,5,7},
-        {'p',1,6,7},
-        {'p',1,7,7},
-        {'p',1,8,7},
-        {'R',5,1,8},
-        {'R',5,8,8},
-        {'N',3,2,8},
-        {'N',3,7,8},
-        {'B',3,3,8},
-        {'B',3,6,8},
-        {'Q',9,4,8},
-        {'K',1000,5,8}
+        {'p',1,0,1},
+        {'p',1,1,1},
+        {'p',1,2,1},
+        {'p',1,3,1},
+        {'p',1,4,1},
+        {'p',1,5,1},
+        {'p',1,6,1},
+        {'p',1,7,1},
+        {'R',5,0,0},
+        {'R',5,7,0},
+        {'N',3,1,0},
+        {'N',3,6,0},
+        {'B',3,2,0},
+        {'B',3,5,0},
+        {'Q',9,3,0},
+        {'K',1000,4,0},
+        {'p',1,0,6},
+        {'p',1,1,6},
+        {'p',1,2,6},
+        {'p',1,3,6},
+        {'p',1,4,6},
+        {'p',1,5,6},
+        {'p',1,6,6},
+        {'p',1,7,6},
+        {'R',5,0,7},
+        {'R',5,7,7},
+        {'N',3,1,7},
+        {'N',3,6,7},
+        {'B',3,2,7},
+        {'B',3,5,7},
+        {'Q',9,3,7},
+        {'K',1000,4,7}
     };
 
+    int grid[64]={};
+    for (int i = 0; i < 64; i++) {
+        grid[i]=32;
+    }
+    
     printf("start\n");
     printf("eval: %f\n",eval(pieces));
-
+    update_grid(pieces,grid);
+    for (int i = 0; i < 64; i++) {
+        //printf("grid: %d\n",grid[i]);
+    }
+    
+    Move move;
+    //main loop
+    for (int i = 1; i < 4; i++) {
+        move = next(1,pieces,grid,2);
+        printf("%d.%c%d%d\n",i,pieces[move.piece].txt, move.x, move.y);
+    }
+    
     return 0;
 }

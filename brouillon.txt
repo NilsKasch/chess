@@ -1,0 +1,34 @@
+/////// PARA /////////
+    //prend en arg une grille + une suite de moves et retourne la valeur du meilleur mouve trouvé et le meilleur move
+    //joue les moves sur la grille (do moves)
+    //parcour chaques moves possibles:
+        // undo moves
+        // La valeur du move est la valeur retournée par next(suite de move + move actuel)
+        // si la valeur est plus grande que celle des moves calculés on la stoque, et on supprime les autres.
+        // si la valeur est égale, on ajoute au tableau en vu de faire un move aléatoire
+        // do moves
+    // a la fin, si il reste un seul move, on le retourne, sinon on retourne aléatoirement un move parmis ceux possibles.
+    // undo moves
+
+
+float play_moves_and_eval(Piece *pieces, int grid[], Move *moves, int moves_number){
+    //fonction qui évalue la grille modifiée par la suite de moves
+    Piece pieces_tmp[32];
+    for (int i = 0; i < 32; i++) {
+        pieces_tmp[i] = pieces[i];
+    }
+    int grid_tmp[64];
+    for (int i = 0; i < 64; i++) {
+        grid_tmp[i] = grid[i];
+    }
+    for (int i=0; i < moves_number; i++){
+        if (grid_tmp[pieces_tmp[moves[i].piece].x+moves[i].x+(pieces_tmp[moves[i].piece].y+moves[i].y)*8]!=32)
+        {
+            pieces_tmp[grid_tmp[pieces_tmp[moves[i].piece].x+moves[i].x+(pieces_tmp[moves[i].piece].y+moves[i].y)*8]].value=-1;
+        }
+        pieces_tmp[moves[i].piece].x=pieces_tmp[moves[i].piece].x+moves[i].x;
+        pieces_tmp[moves[i].piece].y=pieces_tmp[moves[i].piece].y+moves[i].y;
+        update_grid(pieces_tmp,grid_tmp);
+    }
+    return eval(pieces_tmp);
+}
