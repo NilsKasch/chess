@@ -38,7 +38,8 @@ void update_grid(Piece *pieces, int grid[]){
 }
 
 void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
-    if (move->x != 0 && move->y != 0) //safeguard
+    if (move->x != 0 || move->y != 0) //safeguard
+    //printf("bare move: %c%d%d\n",pieces[move->piece].txt, move->x, move->y);
     {
         int target=grid[(pieces[move->piece].x+(move->x))+(pieces[move->piece].y+(move->y))*8];
         if (target!=32){
@@ -55,7 +56,7 @@ void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
 }
 
 void undo_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
-    if (move->x != 0 && move->y != 0) //safeguard
+    if (move->x != 0 || move->y != 0) //safeguard
     {
         if (undo_piece->value > 0){
             pieces[undo_piece->x].txt = undo_piece->txt;
@@ -217,9 +218,10 @@ int main (int argc, char *argv[]){
     for (int i = 1; i < 4; i++) {
         move = next(white,pieces,grid,move,2);
         apply_move(pieces,grid,&move, &undo_piece);
-        plot_grid(pieces,grid);
         lettre = 'a' + pieces[move.piece].x+move.x;
+        //printf("bare move: %c%d%d\n",pieces[move.piece].txt, move.x, move.y);
         printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
+        plot_grid(pieces,grid);
         white=-white;
     }
     
