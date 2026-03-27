@@ -95,21 +95,28 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     Piece undo_piece;
     undo_piece.value=-1;
     best.value=-1000;
-    apply_move(pieces,grid,&move, &undo_piece);
+    if (move.x != 0 && move.y != 0){
+        apply_move(pieces,grid,&move, &undo_piece);
+    }
     if (depth == 0){
         best.piece=move.piece;
         best.x=move.x;
         best.y=move.y;
         best.value=eval(pieces);
-        undo_move(pieces,grid,&move, &undo_piece);
+        if (move.x != 0 && move.y != 0){
+            undo_move(pieces,grid,&move, &undo_piece);
+        }
         return best;
     }
     for (int i = 8 - white*8 ; i < 24 - white*8 ; i++) {
         if (pieces[i].value < 0){
             continue;
         }
+        
         if (pieces[i].txt == 'p'){
+            //printf("ok\n");
             if (grid[pieces[i].x+(pieces[i].y+1*white)*8]!=32 && 0 <= pieces[i].y+1*white && pieces[i].y+1*white < 8){
+                printf("ok\n");
                 tmp.x=0;
                 tmp.y=1*white;
                 tmp.piece=i;
@@ -121,7 +128,9 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
         }
     }
-    undo_move(pieces,grid,&move, &undo_piece);
+    if (move.x != 0 && move.y != 0){
+        undo_move(pieces,grid,&move, &undo_piece);
+    }
     return best;
 }
 
