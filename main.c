@@ -31,10 +31,9 @@ void update_grid(Piece *pieces, int grid[]){
         grid[i]=32;
     }
     for (int i = 0; i < 32; i++) {
-        if (pieces[i].value < 0){
-            continue;
+        if (pieces[i].value > 0){
+            grid[pieces[i].x+pieces[i].y*8]=i;
         }
-        grid[pieces[i].x+pieces[i].y*8]=i;
     }
 }
 
@@ -135,6 +134,20 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     return best;
 }
 
+void plot_grid(Piece *pieces, int grid[]){
+    for (int i = 0; i < 64; i++){
+        if (grid[i]==32){
+            printf("x ");
+        }
+        else{
+            printf("%c ", pieces[grid[i]].txt);
+        }
+        if ((i+1)%8==0){
+            printf("\n");
+        }
+    }
+}
+
 int main (int argc, char *argv[]){
     if (argc == 2)
     {
@@ -204,6 +217,7 @@ int main (int argc, char *argv[]){
     for (int i = 1; i < 4; i++) {
         move = next(white,pieces,grid,move,2);
         apply_move(pieces,grid,&move, &undo_piece);
+        plot_grid(pieces,grid);
         lettre = 'a' + pieces[move.piece].x+move.x;
         printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
         white=-white;
