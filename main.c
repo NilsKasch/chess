@@ -91,8 +91,9 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
         // si la valeur est plus grande que celle des moves calculés on la stoque, et on supprime les autres.
         // si la valeur est égale, on ajoute au tableau en vu de faire un move aléatoire
         // undo move
-    Move best, tmp;
-    Piece undo_piece;
+    Move best = {};
+    Move tmp = {};
+    Piece undo_piece = {};
     undo_piece.value=-1;
     best.value=-1000;
     if (move.x != 0 && move.y != 0){
@@ -112,11 +113,9 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
         if (pieces[i].value < 0){
             continue;
         }
-        
         if (pieces[i].txt == 'p'){
-            //printf("ok\n");
             if (grid[pieces[i].x+(pieces[i].y+1*white)*8]!=32 && 0 <= pieces[i].y+1*white && pieces[i].y+1*white < 8){
-                printf("ok\n");
+                //printf("ok\n");
                 tmp.x=0;
                 tmp.y=1*white;
                 tmp.piece=i;
