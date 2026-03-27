@@ -102,7 +102,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     Move tmp = {};
     Piece undo_piece = {};
     undo_piece.value=-1;
-    best.value=-1000;
+    best.value=-1000*white;
     apply_move(pieces,grid,&move, &undo_piece);
     if (depth == 0){
         best.piece=move.piece;
@@ -221,13 +221,15 @@ int main (int argc, char *argv[]){
     short white=1;
     //main loop
     for (int i = 1; i < 4; i++) {
-        move = next(white,pieces,grid,move,1);
+        move = next(white,pieces,grid,move,2);
         lettre = 'a' + pieces[move.piece].x+move.x;
         //printf("bare move: %c%d%d\n",pieces[move.piece].txt, move.x, move.y);
         printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
         apply_move(pieces,grid,&move, &undo_piece);
         plot_grid(pieces,grid);
         white=-white;
+        move.x=0;
+        move.y=0;
     }
     
     return 0;
