@@ -136,15 +136,19 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
 }
 
 void plot_grid(Piece *pieces, int grid[]){
-    for (int i = 0; i < 64; i++){
-        if (grid[i]==32){
-            printf("x ");
-        }
-        else{
-            printf("%c ", pieces[grid[i]].txt);
-        }
-        if ((i+1)%8==0){
-            printf("\n");
+    int i;
+    for (int y = 7; y >= 0; y--){
+        for (int x = 0; x < 8; x++){
+            i = x + 8*y;
+            if (grid[i]==32){
+                printf(". ");
+            }
+            else{
+                printf("%c ", pieces[grid[i]].txt);
+            }
+            if ((i+1)%8==0){
+                printf("\n");
+            }
         }
     }
 }
