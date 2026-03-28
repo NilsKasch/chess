@@ -90,6 +90,18 @@ void keep(Move *best, Move *tmp, short *white){
     }
 }
 
+int is_on_the_board(Piece *piece, Move *move){
+    if (0 <= piece->x+move->x && piece->x+move->x < 8){
+        if (0 <= piece->y+move->y && piece->y+move->y < 8){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int piece_there(Piece *piece, int grid[], Move *move){
+    return grid[piece->x+move->x+(piece->y+move->y)*8];
+}
 
 Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     /////// SEQ /////////
@@ -125,6 +137,17 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             continue;
         }
         if (pieces[i].txt == 'p'){
+            tmp.x=0;
+            tmp.y=1*white;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && piece_there(&pieces[i], grid, &tmp)==32)
+            {
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            
+            /*
             if (grid[pieces[i].x+(pieces[i].y+1*white)*8]==32 && 0 <= pieces[i].y+1*white && pieces[i].y+1*white < 8){
                 //printf("ok\n");
                 tmp.x=0;
@@ -136,6 +159,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 fill += 1;
                 //keep(&best, &tmp, &white);
             }
+            */
         }
     }
     undo_move(pieces,grid,&move, &undo_piece);
