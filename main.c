@@ -140,6 +140,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     }
     undo_move(pieces,grid,&move, &undo_piece);
     // select
+    best = possible[0];
     for (int i=0; i < fill; i++){
         if (possible[i].value*white > best.value*white){
             best = possible[i];
@@ -265,6 +266,7 @@ int main (int argc, char *argv[]){
         printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
         apply_move(pieces,grid,&move, &undo_piece);
         plot_grid(pieces,grid);
+        printf("\n");
         white=-white;
         move.x=0;
         move.y=0;
