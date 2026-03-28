@@ -14,6 +14,85 @@ typedef struct {
     float value;
 }Move;
 
+char *get_symbole(Piece *piece, int i){
+    if (i<16){
+        if (piece->txt == 'p'){
+            return "♟";
+        }
+        else if (piece->txt == 'K'){
+            return "♚";
+        }
+        else if (piece->txt == 'Q'){
+            return "♛";
+        }
+        else if (piece->txt == 'R'){
+            return "♜";
+        }
+        else if (piece->txt == 'B'){
+            return "♝";
+        }
+        else if (piece->txt == 'N'){
+            return "♞";
+        }
+    }
+    else{
+        if (piece->txt == 'p'){
+            return "♙";
+        }
+        else if (piece->txt == 'K'){
+            return "♔";
+        }
+        else if (piece->txt == 'Q'){
+            return "♕";
+        }
+        else if (piece->txt == 'R'){
+            return "♖";
+        }
+        else if (piece->txt == 'B'){
+            return "♗";
+        }
+        else if (piece->txt == 'N'){
+            return "♘";
+        }
+    }
+}
+
+void plot_grid_old(Piece *pieces, int grid[]){
+    int i;
+    for (int y = 7; y >= 0; y--){
+        for (int x = 0; x < 8; x++){
+            i = x + 8*y;
+            if (grid[i]==32){
+                printf(". ");
+            }
+            else{
+                printf("%c ", pieces[grid[i]].txt);
+            }
+            if ((i+1)%8==0){
+                printf("\n");
+            }
+        }
+    }
+}
+
+void plot_grid(Piece *pieces, int grid[]){
+    int i;
+    for (int y = 7; y >= 0; y--){
+        for (int x = 0; x < 8; x++){
+            i = x + 8*y;
+            if (grid[i]==32){
+                printf(". ");
+            }
+            else{
+                printf("%s ", get_symbole(&pieces[grid[i]],grid[i]));
+            }
+            if ((i+1)%8==0){
+                printf("\n");
+            }
+        }
+    }
+}
+
 float eval(Piece *pieces){
     float sum=0;
     for (int i = 0; i < 16; i++) {
@@ -103,6 +182,16 @@ int piece_there(Piece *piece, int grid[], Move *move){
     return grid[piece->x+move->x+(piece->y+move->y)*8];
 }
 
+int opponent_piece_there(Piece *piece, int grid[], Move *move, short *white){
+    //white = your color
+    int target=grid[piece->x+move->x+(piece->y+move->y)*8];
+    if ( 8 + *white*8 <= target && target < 24 + *white*8 )
+    {
+        return 1;
+    }
+    return 0;
+}
+
 Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     /////// SEQ /////////
     //prend en arg une grille et retourne la valeur du meilleur mouve trouvé et le meilleur move
@@ -151,12 +240,9 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             tmp.x=-1;
             tmp.y=1*white;
             tmp.piece=i;
-            if (is_on_the_board(&pieces[i],&tmp) && piece_there(&pieces[i], grid, &tmp)!=32)
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white))
             {
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                if (depth == 3){
-                    printf("FTW: %f\n",tmp.value);
-                }
                 possible[fill]=tmp;
                 fill += 1;
             }
@@ -184,85 +270,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
         printf("%d\n",equal);
     }
     return best;
-}
-
-char *get_symbole(Piece *piece, int i){
-    if (i<16){
-        if (piece->txt == 'p'){
-            return "♟";
-        }
-        else if (piece->txt == 'K'){
-            return "♚";
-        }
-        else if (piece->txt == 'Q'){
-            return "♛";
-        }
-        else if (piece->txt == 'R'){
-            return "♜";
-        }
-        else if (piece->txt == 'B'){
-            return "♝";
-        }
-        else if (piece->txt == 'N'){
-            return "♞";
-        }
-    }
-    else{
-        if (piece->txt == 'p'){
-            return "♙";
-        }
-        else if (piece->txt == 'K'){
-            return "♔";
-        }
-        else if (piece->txt == 'Q'){
-            return "♕";
-        }
-        else if (piece->txt == 'R'){
-            return "♖";
-        }
-        else if (piece->txt == 'B'){
-            return "♗";
-        }
-        else if (piece->txt == 'N'){
-            return "♘";
-        }
-    }
-}
-
-void plot_grid_old(Piece *pieces, int grid[]){
-    int i;
-    for (int y = 7; y >= 0; y--){
-        for (int x = 0; x < 8; x++){
-            i = x + 8*y;
-            if (grid[i]==32){
-                printf(". ");
-            }
-            else{
-                printf("%c ", pieces[grid[i]].txt);
-            }
-            if ((i+1)%8==0){
-                printf("\n");
-            }
-        }
-    }
-}
-
-void plot_grid(Piece *pieces, int grid[]){
-    int i;
-    for (int y = 7; y >= 0; y--){
-        for (int x = 0; x < 8; x++){
-            i = x + 8*y;
-            if (grid[i]==32){
-                printf(". ");
-            }
-            else{
-                printf("%s ", get_symbole(&pieces[grid[i]],grid[i]));
-            }
-            if ((i+1)%8==0){
-                printf("\n");
-            }
-        }
-    }
 }
 
 int main (int argc, char *argv[]){
