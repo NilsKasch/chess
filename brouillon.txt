@@ -32,3 +32,52 @@ float play_moves_and_eval(Piece *pieces, int grid[], Move *moves, int moves_numb
     }
     return eval(pieces_tmp);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// affichage de la grille qui marche pas top
+
+#define WHITE_BG "\033[47m"
+#define BLACK_BG "\033[40m"
+#define RESET "\033[0m"
+
+void plot_board(Piece *pieces, int grid[]){
+    int i;
+    for (int y = 7; y >= 0; y--){
+        for (int x = 0; x < 8; x++){
+            i = x + 8*y;
+            if (grid[i]==32){
+                if ((x+y)%2==0){
+                    printf(BLACK_BG "   ");
+                }
+                else{
+                    printf(WHITE_BG "   ");
+                }
+            }
+            else{
+                if ((x+y)%2==0){
+                    printf(BLACK_BG " %s ", get_symbole(&pieces[grid[i]],grid[i]));
+                }
+                else{
+                    printf(WHITE_BG " %s ", get_symbole(&pieces[grid[i]],grid[i]));
+                }
+            }
+            if ((i+1)%8==0){
+                printf(RESET "\n");
+            }
+        }
+    }
+}

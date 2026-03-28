@@ -137,6 +137,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             continue;
         }
         if (pieces[i].txt == 'p'){
+            // move foreward
             tmp.x=0;
             tmp.y=1*white;
             tmp.piece=i;
@@ -146,20 +147,17 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 possible[fill]=tmp;
                 fill += 1;
             }
-            
-            /*
-            if (grid[pieces[i].x+(pieces[i].y+1*white)*8]==32 && 0 <= pieces[i].y+1*white && pieces[i].y+1*white < 8){
-                //printf("ok\n");
-                tmp.x=0;
-                tmp.y=1*white;
-                tmp.piece=i;
-                //printf("ok.%c%d%d\n",pieces[tmp.piece].txt, tmp.x, tmp.y);
+            // eat on the left
+            tmp.x=-1;
+            tmp.y=1*white;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && piece_there(&pieces[i], grid, &tmp)!=32)
+            {
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
-                //keep(&best, &tmp, &white);
             }
-            */
+
         }
     }
     undo_move(pieces,grid,&move, &undo_piece);
@@ -183,7 +181,50 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     return best;
 }
 
-void plot_grid(Piece *pieces, int grid[]){
+char *get_symbole(Piece *piece, int i){
+    if (i<16){
+        if (piece->txt == 'p'){
+            return "♟";
+        }
+        else if (piece->txt == 'K'){
+            return "♚";
+        }
+        else if (piece->txt == 'Q'){
+            return "♛";
+        }
+        else if (piece->txt == 'R'){
+            return "♜";
+        }
+        else if (piece->txt == 'B'){
+            return "♝";
+        }
+        else if (piece->txt == 'N'){
+            return "♞";
+        }
+    }
+    else{
+        if (piece->txt == 'p'){
+            return "♙";
+        }
+        else if (piece->txt == 'K'){
+            return "♔";
+        }
+        else if (piece->txt == 'Q'){
+            return "♕";
+        }
+        else if (piece->txt == 'R'){
+            return "♖";
+        }
+        else if (piece->txt == 'B'){
+            return "♗";
+        }
+        else if (piece->txt == 'N'){
+            return "♘";
+        }
+    }
+}
+
+void plot_grid_old(Piece *pieces, int grid[]){
     int i;
     for (int y = 7; y >= 0; y--){
         for (int x = 0; x < 8; x++){
@@ -193,6 +234,24 @@ void plot_grid(Piece *pieces, int grid[]){
             }
             else{
                 printf("%c ", pieces[grid[i]].txt);
+            }
+            if ((i+1)%8==0){
+                printf("\n");
+            }
+        }
+    }
+}
+
+void plot_grid(Piece *pieces, int grid[]){
+    int i;
+    for (int y = 7; y >= 0; y--){
+        for (int x = 0; x < 8; x++){
+            i = x + 8*y;
+            if (grid[i]==32){
+                printf(". ");
+            }
+            else{
+                printf("%s ", get_symbole(&pieces[grid[i]],grid[i]));
             }
             if ((i+1)%8==0){
                 printf("\n");
