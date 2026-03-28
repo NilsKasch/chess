@@ -246,6 +246,16 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 possible[fill]=tmp;
                 fill += 1;
             }
+            // eat on the right (for white, and left for black)
+            tmp.x=1;
+            tmp.y=1*white;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white))
+            {
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
 
         }
     }
@@ -265,9 +275,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     }
     if (equal > 1){
         best=possible_best[rand() % equal];
-    }
-    if (depth == 3){
-        printf("%d\n",equal);
     }
     return best;
 }
