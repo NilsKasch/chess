@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 typedef struct {
     char txt;
@@ -101,7 +102,12 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
         // undo move
     Move best = {};
     Move tmp = {};
+    Move possible[138] = {};
+    Move possible_best[138] = {};
     Piece undo_piece = {};
+    int fill = 0;
+    int equal = 0;
+
     undo_piece.value=-1;
     best.value=-1000*white;
     apply_move(pieces,grid,&move, &undo_piece);
@@ -125,15 +131,30 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 tmp.y=1*white;
                 tmp.piece=i;
                 //printf("ok.%c%d%d\n",pieces[tmp.piece].txt, tmp.x, tmp.y);
-                tmp = next(-white,pieces, grid, tmp, depth - 1); //clacul value
-                tmp.x=0;
-                tmp.y=1*white;
-                tmp.piece=i;
-                keep(&best, &tmp, &white);
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+                //keep(&best, &tmp, &white);
             }
         }
     }
     undo_move(pieces,grid,&move, &undo_piece);
+    // select
+    for (int i=0; i < fill; i++){
+        if (possible[i].value*white > best.value*white){
+            best = possible[i];
+        }
+    }
+    for (int i=0; i < fill; i++){
+        if (possible[i].value == best.value){
+            possible_best[equal]=possible[i];
+            equal += 1;
+        }
+    }
+    if (equal > 1){
+        best=possible_best[rand() % equal];
+    }
+    //printf("%d\n",equal);
     return best;
 }
 
@@ -232,9 +253,10 @@ int main (int argc, char *argv[]){
     */
 
     Move move = {0,0,0,0};
-    Piece undo_piece = {}; //useless here
+    Piece undo_piece = {};
     char lettre;
     short white=1;
+    srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
         move = next(white,pieces,grid,move,d);
