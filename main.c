@@ -96,7 +96,7 @@ int piece_there(Piece *piece, int grid[], Move *move){
 int clean_way(Piece *piece, int grid[], Move *move){
     for (int x=0; x <= move->x; x++){
         for (int y=0; y <= move->y; y++){
-            if ((x!=0 || y!=0) && piece_there(piece, grid, move)!=32)
+            if ((x!=0 || y!=0) && grid[piece->x+x+(piece->y+y)*8]!=32)
                 return 0;
         }
     }
@@ -107,6 +107,16 @@ int opponent_piece_there(Piece *piece, int grid[], Move *move, short *white){
     //white = your color
     int target=grid[piece->x+move->x+(piece->y+move->y)*8];
     if ( 8 + *white*8 <= target && target < 24 + *white*8 )
+    {
+        return 1;
+    }
+    return 0;
+}
+
+int opponent_or_free_there(Piece *piece, int grid[], Move *move, short *white){
+    //white = your color
+    int target=grid[piece->x+move->x+(piece->y+move->y)*8];
+    if ((8 + *white*8 <= target && target < 24 + *white*8) || target==32)
     {
         return 1;
     }
@@ -189,7 +199,72 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 possible[fill]=tmp;
                 fill += 1;
             }
-
+        }
+        else if (pieces[i].txt == 'N'){
+            tmp.x=1;
+            tmp.y=2;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=-1;
+            tmp.y=2;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=1;
+            tmp.y=-2;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=-1;
+            tmp.y=-2;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=2;
+            tmp.y=1;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=2;
+            tmp.y=-1;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=-2;
+            tmp.y=1;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=-2;
+            tmp.y=-1;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
         }
     }
     undo_move(pieces,grid,&move, &undo_piece);
