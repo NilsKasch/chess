@@ -93,6 +93,16 @@ int piece_there(Piece *piece, int grid[], Move *move){
     return grid[piece->x+move->x+(piece->y+move->y)*8];
 }
 
+int clean_way(Piece *piece, int grid[], Move *move){
+    for (int x=0; x <= move->x; x++){
+        for (int y=0; y <= move->y; y++){
+            if ((x!=0 || y!=0) && piece_there(piece, grid, move)!=32)
+                return 0;
+        }
+    }
+    return 1;
+ }
+
 int opponent_piece_there(Piece *piece, int grid[], Move *move, short *white){
     //white = your color
     int target=grid[piece->x+move->x+(piece->y+move->y)*8];
@@ -137,7 +147,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             continue;
         }
         if (pieces[i].txt == 'p'){
-            // move foreward
+            // move forward
             tmp.x=0;
             tmp.y=1*white;
             tmp.piece=i;
@@ -146,6 +156,18 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
+            }
+            // move forward +2
+            if ((white==1 && pieces[i].y==1) || (white==-1 && pieces[i].y==6)){
+                tmp.x=0;
+                tmp.y=2*white;
+                tmp.piece=i;
+                if (is_on_the_board(&pieces[i],&tmp) && clean_way(&pieces[i], grid, &tmp))
+                {
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                }
             }
             // eat on the left (for white, and right for black)
             tmp.x=-1;
