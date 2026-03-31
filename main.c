@@ -185,11 +185,11 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
         if (pieces[i].value < 0){
             continue;
         }
+        tmp.piece=i;
         if (pieces[i].txt == 'p'){
             // move forward
             tmp.x=0;
             tmp.y=1*white;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && piece_there(&pieces[i], grid, &tmp)==32)
             {
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
@@ -200,7 +200,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             if ((white==1 && pieces[i].y==1) || (white==-1 && pieces[i].y==6)){
                 tmp.x=0;
                 tmp.y=2*white;
-                tmp.piece=i;
                 if (is_on_the_board(&pieces[i],&tmp) && clean_full_way(&pieces[i], grid, &tmp))
                 {
                     tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
@@ -211,7 +210,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             // eat on the left (for white, and right for black)
             tmp.x=-1;
             tmp.y=1*white;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white))
             {
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
@@ -221,7 +219,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             // eat on the right (for white, and left for black)
             tmp.x=1;
             tmp.y=1*white;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white))
             {
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
@@ -232,7 +229,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
         else if (pieces[i].txt == 'N'){
             tmp.x=1;
             tmp.y=2;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -240,7 +236,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
             tmp.x=-1;
             tmp.y=2;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -248,7 +243,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
             tmp.x=1;
             tmp.y=-2;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -256,7 +250,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
             tmp.x=-1;
             tmp.y=-2;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -264,7 +257,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
             tmp.x=2;
             tmp.y=1;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -272,7 +264,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
             tmp.x=2;
             tmp.y=-1;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -280,7 +271,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
             tmp.x=-2;
             tmp.y=1;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -288,7 +278,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
             tmp.x=-2;
             tmp.y=-1;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -299,7 +288,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=x;
                 tmp.y=x;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -312,7 +300,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=-x;
                 tmp.y=x;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -325,7 +312,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=x;
                 tmp.y=-x;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -338,7 +324,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=-x;
                 tmp.y=-x;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -353,7 +338,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=x;
                 tmp.y=0;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -366,7 +350,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=-x;
                 tmp.y=0;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -379,7 +362,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=0;
                 tmp.y=x;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -392,7 +374,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=0;
                 tmp.y=-x;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -408,7 +389,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=x;
                 tmp.y=x;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -421,7 +401,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=-x;
                 tmp.y=x;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -434,7 +413,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=x;
                 tmp.y=-x;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -447,7 +425,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=-x;
                 tmp.y=-x;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -461,7 +438,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=x;
                 tmp.y=0;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -474,7 +450,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=-x;
                 tmp.y=0;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -487,7 +462,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=0;
                 tmp.y=x;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -500,7 +474,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             for (int x=0; x<8; x++){
                 tmp.x=0;
                 tmp.y=-x;
-                tmp.piece=i;
                 if (!is_on_the_board(&pieces[i],&tmp)){
                     break;
                 }
@@ -514,7 +487,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
         else if (pieces[i].txt == 'K'){
             tmp.x=1;
             tmp.y=0;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -522,7 +494,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
             tmp.x=1;
             tmp.y=1;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -530,7 +501,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
             tmp.x=0;
             tmp.y=1;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -538,7 +508,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
             tmp.x=-1;
             tmp.y=1;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -546,7 +515,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
             tmp.x=-1;
             tmp.y=0;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -554,7 +522,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
             tmp.x=-1;
             tmp.y=-1;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -562,7 +529,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
             tmp.x=0;
             tmp.y=-1;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
@@ -570,7 +536,6 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
             tmp.x=1;
             tmp.y=-1;
-            tmp.piece=i;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
