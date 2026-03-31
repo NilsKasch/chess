@@ -511,6 +511,72 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
             }
         }
+        else if (pieces[i].txt == 'K'){
+            tmp.x=1;
+            tmp.y=0;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=1;
+            tmp.y=1;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=0;
+            tmp.y=1;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=-1;
+            tmp.y=1;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=-1;
+            tmp.y=0;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=-1;
+            tmp.y=-1;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=0;
+            tmp.y=-1;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=1;
+            tmp.y=-1;
+            tmp.piece=i;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+        }
     }
     undo_move(pieces,grid,&move, &undo_piece);
     // select
