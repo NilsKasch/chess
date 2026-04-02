@@ -29,8 +29,8 @@ void update_grid(Piece *pieces, int grid[]){
     }
 }
 
-void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
-    if (move->x != 0 || move->y != 0) //safeguard
+void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece, int *king_hit){
+    if (move->x != 0 || move->y != 0) //safeguard TODO:remove it
     //printf("bare move: %c%d%d\n",pieces[move->piece].txt, move->x, move->y);
     {
         int target=grid[(pieces[move->piece].x+(move->x))+(pieces[move->piece].y+(move->y))*8];
@@ -40,10 +40,14 @@ void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
             undo_piece->x = target;
             undo_piece->y = target;
             pieces[target].value=-1;
+            if (target == 15 || target == 31){
+                *king_hit=1;
+            }
         }
         pieces[move->piece].x += move->x;
         pieces[move->piece].y += move->y;
         update_grid(pieces, grid);
+
     }
 }
 
@@ -168,11 +172,12 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     Piece undo_piece = {};
     int fill = 0;
     int equal = 0;
+    int king_hit = 0;
 
     undo_piece.value=-1;
     best.value=-1000*white;
-    apply_move(pieces,grid,&move, &undo_piece);
-    if (depth == 0){
+    apply_move(pieces,grid,&move, &undo_piece, &king_hit);
+    if (depth == 0 || king_hit){
         best.piece=move.piece;
         best.x=move.x;
         best.y=move.y;
@@ -545,6 +550,9 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     }
     undo_move(pieces,grid,&move, &undo_piece);
     // select
+    if (fill==0){
+        return best;
+    }
     best = possible[0];
     for (int i=0; i < fill; i++){
         if (possible[i].value*white > best.value*white){
@@ -642,15 +650,28 @@ int main (int argc, char *argv[]){
     Move move = {0,0,0,0};
     Piece undo_piece = {};
     char lettre;
-    short white=1;
-    srand(time(NULL));  // Seed
+    short white = 1;
+    int king_hit = 0;
+    srand(2);
+    //srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
         move = next(white,pieces,grid,move,d);
         lettre = 'a' + pieces[move.piece].x+move.x;
         //printf("bare move: %c%d%d\n",pieces[move.piece].txt, move.x, move.y);
         printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
-        apply_move(pieces,grid,&move, &undo_piece);
+        apply_move(pieces,grid,&move, &undo_piece, &king_hit);
+        if (king_hit){
+            undo_move(pieces,grid,&move,&undo_piece);
+            king_hit = piece_there(pieces, grid, &move);
+            if (king_hit == 15){
+                printf("Black win\n");
+            }
+            else{
+                printf("White Win\n");
+            }
+            break;
+        }
         plot_grid(pieces,grid);
         printf("\n");
         white=-white;
