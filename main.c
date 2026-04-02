@@ -156,6 +156,89 @@ int opponent_or_free_there(Piece *piece, int grid[], Move *move, short *white){
     return 0;
 }
 
+int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white){
+    //white = your color
+    int target_x = pieces[piece].x+move->x;
+    int target_y = pieces[piece].y+move->y;
+    for (int i = 8 + *white*8 ; i < 24 + *white*8 ; i++) {
+        //printf("%d\n",i);
+        if (pieces[i].value < 0){
+            continue;
+        }
+        if (pieces[i].txt == 'p'){
+            if (target_x == pieces[i].x - 1 || target_x == pieces[i].x + 1){
+                if(target_y == pieces[i].y + 1){
+                    return  0;
+                }
+            }
+        }
+        else if (pieces[i].txt == 'N'){
+            if (target_x == pieces[i].x - 1 || target_x == pieces[i].x + 1){
+                if(target_y == pieces[i].y - 2 || target_y == pieces[i].y + 2){
+                    return  0;
+                }
+            }
+            if (target_x == pieces[i].x - 2 || target_x == pieces[i].x + 2){
+                if(target_y == pieces[i].y - 1 || target_y == pieces[i].y + 1){
+                    return  0;
+                }
+            }
+        }
+        else if (pieces[i].txt == 'B'){
+            for (int x=1; x<8; x++){
+                if (target_x == pieces[i].x + x || target_x == pieces[i].x - x){
+                    if(target_y == pieces[i].y + x || target_y == pieces[i].y - x){
+                        return  0;
+                    }
+                }
+            }
+        }
+        else if (pieces[i].txt == 'R'){
+            for (int x=1; x<8; x++){
+                if ((target_x == pieces[i].x + x || target_x == pieces[i].x - x) && target_y == pieces[i].y){
+                    return 0;
+                }
+                if ((target_y == pieces[i].y + x || target_y == pieces[i].y - x) && target_x == pieces[i].x){
+                    return 0;
+                }
+            }
+        }
+        else if (pieces[i].txt == 'Q'){
+            for (int x=1; x<8; x++){
+                //rook
+                if ((target_x == pieces[i].x + x || target_x == pieces[i].x - x) && target_y == pieces[i].y){
+                    return 0;
+                }
+                if ((target_y == pieces[i].y + x || target_y == pieces[i].y - x) && target_x == pieces[i].x){
+                    return 0;
+                }
+                //bishop
+                if (target_x == pieces[i].x + x || target_x == pieces[i].x - x){
+                    if(target_y == pieces[i].y + x || target_y == pieces[i].y - x){
+                        return  0;
+                    }
+                }
+            }
+        }
+        else if (pieces[i].txt == 'K'){
+            //rook
+            if ((target_x == pieces[i].x + 1 || target_x == pieces[i].x - 1) && target_y == pieces[i].y){
+                return 0;
+            }
+            if ((target_y == pieces[i].y + 1 || target_y == pieces[i].y - 1) && target_x == pieces[i].x){
+                return 0;
+            }
+            //bishop
+            if (target_x == pieces[i].x + 1 || target_x == pieces[i].x - 1){
+                if(target_y == pieces[i].y + 1 || target_y == pieces[i].y - 1){
+                    return  0;
+                }
+            }
+        }
+    }
+    return 1;
+}
+
 Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     /////// SEQ /////////
     //prend en arg une grille et retourne la valeur du meilleur mouve trouvé et le meilleur move
@@ -492,56 +575,56 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
         else if (pieces[i].txt == 'K'){
             tmp.x=1;
             tmp.y=0;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
             }
             tmp.x=1;
             tmp.y=1;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
             }
             tmp.x=0;
             tmp.y=1;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
             }
             tmp.x=-1;
             tmp.y=1;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
             }
             tmp.x=-1;
             tmp.y=0;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
             }
             tmp.x=-1;
             tmp.y=-1;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
             }
             tmp.x=0;
             tmp.y=-1;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
             }
             tmp.x=1;
             tmp.y=-1;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
