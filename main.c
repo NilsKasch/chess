@@ -168,7 +168,7 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
         }
         if (pieces[i].txt == 'p'){
             if (target_x == pieces[i].x - 1 || target_x == pieces[i].x + 1){
-                if(target_y == pieces[i].y + 1){
+                if(target_y == pieces[i].y - 1*(*white)){
                     return  0;
                 }
             }
@@ -1165,8 +1165,7 @@ int main (int argc, char *argv[]){
     char lettre;
     short white = 1;
     int king_hit = 0;
-    srand(2);
-    //srand(time(NULL));  // Seed
+    srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
         move = next(white,pieces,grid,move,d);
