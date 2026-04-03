@@ -341,737 +341,366 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
         undo_move(pieces,grid,&move, &undo_piece);
         return best;
     }
-    if (!not_defended(23-8*white, pieces, grid, &tmp, &white))
-    {
-        // king under attack
-        for (int i = 8 - white*8 ; i < 24 - white*8 ; i++) {
-            //printf("%d\n",i);
-            if (pieces[i].value < 0){
-                continue;
+    for (int i = 8 - white*8 ; i < 24 - white*8 ; i++) {
+        //printf("%d\n",i);
+        if (pieces[i].value < 0){
+            continue;
+        }
+        tmp.piece=i;
+        if (pieces[i].txt == 'p'){
+            // move forward
+            tmp.x=0;int defended = 0;
+            tmp.y=1*white;
+            if (is_on_the_board(&pieces[i],&tmp) && piece_there(&pieces[i], grid, &tmp)==32 && move_defend_king(pieces, grid, &tmp, &white))
+            {
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
             }
-            tmp.piece=i;
-            if (pieces[i].txt == 'p'){
-                // move forward
-                tmp.x=0;int defended = 0;
-                tmp.y=1*white;
-                if (is_on_the_board(&pieces[i],&tmp) && piece_there(&pieces[i], grid, &tmp)==32 && move_defend_king(pieces, grid, &tmp, &white))
-                {
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                // move forward +2
-                if ((white==1 && pieces[i].y==1) || (white==-1 && pieces[i].y==6)){
-                    tmp.x=0;
-                    tmp.y=2*white;
-                    if (is_on_the_board(&pieces[i],&tmp) && clean_full_way(&pieces[i], grid, &tmp) && move_defend_king(pieces, grid, &tmp, &white))
-                    {
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                // eat on the left (for white, and right for black)
-                tmp.x=-1;
-                tmp.y=1*white;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white))
-                {
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                // eat on the right (for white, and left for black)
-                tmp.x=1;
-                tmp.y=1*white;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white))
-                {
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-            }
-            else if (pieces[i].txt == 'N'){
-                tmp.x=1;
-                tmp.y=2;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=-1;
-                tmp.y=2;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=1;
-                tmp.y=-2;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=-1;
-                tmp.y=-2;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=2;
-                tmp.y=1;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=2;
-                tmp.y=-1;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=-2;
-                tmp.y=1;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=-2;
-                tmp.y=-1;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-            }
-            else if (pieces[i].txt == 'B'){
-                for (int x=0; x<8; x++){
-                    tmp.x=x;
-                    tmp.y=x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=-x;
-                    tmp.y=x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=x;
-                    tmp.y=-x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=-x;
-                    tmp.y=-x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-            }
-            else if (pieces[i].txt == 'R'){
-                for (int x=0; x<8; x++){
-                    tmp.x=x;
-                    tmp.y=0;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=-x;
-                    tmp.y=0;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=0;
-                    tmp.y=x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=0;
-                    tmp.y=-x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-            }
-            else if (pieces[i].txt == 'Q'){
-                //BISHOP
-                for (int x=0; x<8; x++){
-                    tmp.x=x;
-                    tmp.y=x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=-x;
-                    tmp.y=x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=x;
-                    tmp.y=-x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=-x;
-                    tmp.y=-x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                //ROOK
-                for (int x=0; x<8; x++){
-                    tmp.x=x;
-                    tmp.y=0;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=-x;
-                    tmp.y=0;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=0;
-                    tmp.y=x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=0;
-                    tmp.y=-x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-            }
-            else if (pieces[i].txt == 'K'){
-                tmp.x=1;
-                tmp.y=0;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=1;
-                tmp.y=1;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
+            // move forward +2
+            if ((white==1 && pieces[i].y==1) || (white==-1 && pieces[i].y==6)){
                 tmp.x=0;
-                tmp.y=1;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+                tmp.y=2*white;
+                if (is_on_the_board(&pieces[i],&tmp) && clean_full_way(&pieces[i], grid, &tmp) && move_defend_king(pieces, grid, &tmp, &white))
+                {
                     tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                     possible[fill]=tmp;
                     fill += 1;
                 }
-                tmp.x=-1;
-                tmp.y=1;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+            }
+            // eat on the left (for white, and right for black)
+            tmp.x=-1;
+            tmp.y=1*white;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white))
+            {
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            // eat on the right (for white, and left for black)
+            tmp.x=1;
+            tmp.y=1*white;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white))
+            {
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+        }
+        else if (pieces[i].txt == 'N'){
+            tmp.x=1;
+            tmp.y=2;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=-1;
+            tmp.y=2;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=1;
+            tmp.y=-2;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=-1;
+            tmp.y=-2;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=2;
+            tmp.y=1;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=2;
+            tmp.y=-1;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=-2;
+            tmp.y=1;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=-2;
+            tmp.y=-1;
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+        }
+        else if (pieces[i].txt == 'B'){
+            for (int x=0; x<8; x++){
+                tmp.x=x;
+                tmp.y=x;
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
                     tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                     possible[fill]=tmp;
                     fill += 1;
                 }
-                tmp.x=-1;
-                tmp.y=0;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+            }
+            for (int x=0; x<8; x++){
+                tmp.x=-x;
+                tmp.y=x;
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
                     tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                     possible[fill]=tmp;
                     fill += 1;
                 }
-                tmp.x=-1;
-                tmp.y=-1;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+            }
+            for (int x=0; x<8; x++){
+                tmp.x=x;
+                tmp.y=-x;
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
                     tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                     possible[fill]=tmp;
                     fill += 1;
                 }
-                tmp.x=0;
-                tmp.y=-1;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+            }
+            for (int x=0; x<8; x++){
+                tmp.x=-x;
+                tmp.y=-x;
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
                 }
-                tmp.x=1;
-                tmp.y=-1;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+                if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
                     tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                     possible[fill]=tmp;
                     fill += 1;
                 }
             }
         }
-    }
-    else
-    {
-        // king not under attack
-        for (int i = 8 - white*8 ; i < 24 - white*8 ; i++) {
-            //printf("%d\n",i);
-            if (pieces[i].value < 0){
-                continue;
-            }
-            tmp.piece=i;
-            if (pieces[i].txt == 'p'){
-                // move forward
-                tmp.x=0;
-                tmp.y=1*white;
-                if (is_on_the_board(&pieces[i],&tmp) && piece_there(&pieces[i], grid, &tmp)==32)
-                {
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                // move forward +2
-                if ((white==1 && pieces[i].y==1) || (white==-1 && pieces[i].y==6)){
-                    tmp.x=0;
-                    tmp.y=2*white;
-                    if (is_on_the_board(&pieces[i],&tmp) && clean_full_way(&pieces[i], grid, &tmp))
-                    {
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                // eat on the left (for white, and right for black)
-                tmp.x=-1;
-                tmp.y=1*white;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white))
-                {
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                // eat on the right (for white, and left for black)
-                tmp.x=1;
-                tmp.y=1*white;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white))
-                {
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-            }
-            else if (pieces[i].txt == 'N'){
-                tmp.x=1;
-                tmp.y=2;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=-1;
-                tmp.y=2;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=1;
-                tmp.y=-2;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=-1;
-                tmp.y=-2;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=2;
-                tmp.y=1;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=2;
-                tmp.y=-1;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=-2;
-                tmp.y=1;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=-2;
-                tmp.y=-1;
-                if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-            }
-            else if (pieces[i].txt == 'B'){
-                for (int x=0; x<8; x++){
-                    tmp.x=x;
-                    tmp.y=x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=-x;
-                    tmp.y=x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=x;
-                    tmp.y=-x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=-x;
-                    tmp.y=-x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-            }
-            else if (pieces[i].txt == 'R'){
-                for (int x=0; x<8; x++){
-                    tmp.x=x;
-                    tmp.y=0;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=-x;
-                    tmp.y=0;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=0;
-                    tmp.y=x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=0;
-                    tmp.y=-x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-            }
-            else if (pieces[i].txt == 'Q'){
-                //BISHOP
-                for (int x=0; x<8; x++){
-                    tmp.x=x;
-                    tmp.y=x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=-x;
-                    tmp.y=x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=x;
-                    tmp.y=-x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=-x;
-                    tmp.y=-x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                //ROOK
-                for (int x=0; x<8; x++){
-                    tmp.x=x;
-                    tmp.y=0;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=-x;
-                    tmp.y=0;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=0;
-                    tmp.y=x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-                for (int x=0; x<8; x++){
-                    tmp.x=0;
-                    tmp.y=-x;
-                    if (!is_on_the_board(&pieces[i],&tmp)){
-                        break;
-                    }
-                    if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white)){
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
-                    }
-                }
-            }
-            else if (pieces[i].txt == 'K'){
-                tmp.x=1;
+        else if (pieces[i].txt == 'R'){
+            for (int x=0; x<8; x++){
+                tmp.x=x;
                 tmp.y=0;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
                     tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                     possible[fill]=tmp;
                     fill += 1;
                 }
-                tmp.x=1;
-                tmp.y=1;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=0;
-                tmp.y=1;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=-1;
-                tmp.y=1;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
-                tmp.x=-1;
+            }
+            for (int x=0; x<8; x++){
+                tmp.x=-x;
                 tmp.y=0;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
                     tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                     possible[fill]=tmp;
                     fill += 1;
                 }
-                tmp.x=-1;
-                tmp.y=-1;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
-                }
+            }
+            for (int x=0; x<8; x++){
                 tmp.x=0;
-                tmp.y=-1;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+                tmp.y=x;
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
                     tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                     possible[fill]=tmp;
                     fill += 1;
                 }
-                tmp.x=1;
-                tmp.y=-1;
-                if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+            }
+            for (int x=0; x<8; x++){
+                tmp.x=0;
+                tmp.y=-x;
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
                     tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                     possible[fill]=tmp;
                     fill += 1;
                 }
+            }
+        }
+        else if (pieces[i].txt == 'Q'){
+            //BISHOP
+            for (int x=0; x<8; x++){
+                tmp.x=x;
+                tmp.y=x;
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                }
+            }
+            for (int x=0; x<8; x++){
+                tmp.x=-x;
+                tmp.y=x;
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                }
+            }
+            for (int x=0; x<8; x++){
+                tmp.x=x;
+                tmp.y=-x;
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                }
+            }
+            for (int x=0; x<8; x++){
+                tmp.x=-x;
+                tmp.y=-x;
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way_diag(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                }
+            }
+            //ROOK
+            for (int x=0; x<8; x++){
+                tmp.x=x;
+                tmp.y=0;
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                }
+            }
+            for (int x=0; x<8; x++){
+                tmp.x=-x;
+                tmp.y=0;
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                }
+            }
+            for (int x=0; x<8; x++){
+                tmp.x=0;
+                tmp.y=x;
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                }
+            }
+            for (int x=0; x<8; x++){
+                tmp.x=0;
+                tmp.y=-x;
+                if (!is_on_the_board(&pieces[i],&tmp)){
+                    break;
+                }
+                if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                }
+            }
+        }
+        else if (pieces[i].txt == 'K'){
+            tmp.x=1;
+            tmp.y=0;
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=1;
+            tmp.y=1;
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=0;
+            tmp.y=1;
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=-1;
+            tmp.y=1;
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=-1;
+            tmp.y=0;
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=-1;
+            tmp.y=-1;
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=0;
+            tmp.y=-1;
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
+            }
+            tmp.x=1;
+            tmp.y=-1;
+            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                possible[fill]=tmp;
+                fill += 1;
             }
         }
     }
@@ -1179,8 +808,8 @@ int main (int argc, char *argv[]){
     char lettre;
     short white = 1;
     int king_hit = 0;
-    srand(6);
-    //srand(time(NULL));  // Seed
+    //srand(6);
+    srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
         move = next(white,pieces,grid,move,d);

@@ -1,4 +1,5 @@
 Improvements:
+- not defended et move defend king a faire a l'envers: en partant de la pièce !
 - incitation à la victoire et pas a faire pat
 - transformation des pions a l'arrivée
 - clean_way / clean_way_diag useless since we check all possible moves one by one, and break when no more possible
