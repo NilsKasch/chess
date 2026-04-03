@@ -1165,7 +1165,7 @@ int main (int argc, char *argv[]){
     char lettre;
     short white = 1;
     int king_hit = 0;
-    srand(3);
+    srand(2);
     //srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
@@ -1174,21 +1174,21 @@ int main (int argc, char *argv[]){
         //printf("bare move: %c%d%d\n",pieces[move.piece].txt, move.x, move.y);
         printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
         if (move.x == 0 && move.y == 0){
-            printf("Pat\n");
+            if (!not_defended(23-8*white, pieces, grid, &move, &white))
+            {
+                if (white==1){
+                    printf("Black win\n");
+                }
+                else{
+                    printf("White Win\n");
+                }
+            }
+            else{
+                printf("Pat\n");
+            }
             break;
         }
         apply_move(pieces,grid,&move, &undo_piece, &king_hit);
-        if (king_hit){
-            undo_move(pieces,grid,&move,&undo_piece);
-            king_hit = piece_there(pieces, grid, &move);
-            if (king_hit == 15){
-                printf("Black win\n");
-            }
-            else{
-                printf("White Win\n");
-            }
-            break;
-        }
         plot_grid(pieces,grid);
         printf("\n");
         white=-white;
