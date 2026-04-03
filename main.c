@@ -30,41 +30,34 @@ void update_grid(Piece *pieces, int grid[]){
 }
 
 void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece, int *king_hit){
-    if (move->x != 0 || move->y != 0) //safeguard TODO:remove it
-    //printf("bare move: %c%d%d\n",pieces[move->piece].txt, move->x, move->y);
-    {
-        int target=grid[(pieces[move->piece].x+(move->x))+(pieces[move->piece].y+(move->y))*8];
-        if (target!=32){
-            undo_piece->txt = pieces[target].txt;
-            undo_piece->value = pieces[target].value;
-            undo_piece->x = target;
-            undo_piece->y = target;
-            pieces[target].value=-1;
-            if (target == 15 || target == 31){
-                *king_hit=1;
-            }
+    //Don't work with x=0 and y=0 move
+    int target=grid[(pieces[move->piece].x+(move->x))+(pieces[move->piece].y+(move->y))*8];
+    if (target!=32){
+        undo_piece->txt = pieces[target].txt;
+        undo_piece->value = pieces[target].value;
+        undo_piece->x = target;
+        undo_piece->y = target;
+        pieces[target].value=-1;
+        if (target == 15 || target == 31){
+            *king_hit=1;
         }
-        pieces[move->piece].x += move->x;
-        pieces[move->piece].y += move->y;
-        update_grid(pieces, grid);
-
     }
+    pieces[move->piece].x += move->x;
+    pieces[move->piece].y += move->y;
+    update_grid(pieces, grid);
 }
 
 void undo_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
-    if (move->x != 0 || move->y != 0) //safeguard
-    //printf("bare move: %c%d%d\n",pieces[move->piece].txt, move->x, move->y);
-    {
-        if (undo_piece->value > 0){
-            pieces[undo_piece->x].txt = undo_piece->txt;
-            pieces[undo_piece->x].value = undo_piece->value;
-            pieces[undo_piece->x].x = pieces[move->piece].x;
-            pieces[undo_piece->x].y = pieces[move->piece].y;
-        }
-        pieces[move->piece].x -= move->x;
-        pieces[move->piece].y -= move->y;
-        update_grid(pieces, grid);
+    //Don't work with x=0 and y=0 move
+    if (undo_piece->value > 0){
+        pieces[undo_piece->x].txt = undo_piece->txt;
+        pieces[undo_piece->x].value = undo_piece->value;
+        pieces[undo_piece->x].x = pieces[move->piece].x;
+        pieces[undo_piece->x].y = pieces[move->piece].y;
     }
+    pieces[move->piece].x -= move->x;
+    pieces[move->piece].y -= move->y;
+    update_grid(pieces, grid);
 }
 
 void keep(Move *best, Move *tmp, short *white){
@@ -318,7 +311,9 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
 
     undo_piece.value=-1;
     best.value=-1000*white;
-    apply_move(pieces,grid,&move, &undo_piece, &king_hit);
+    if (move.x != 0 || move.y != 0){
+        apply_move(pieces,grid,&move, &undo_piece, &king_hit);
+    }
     if (depth == 0 || king_hit){
         best.piece=move.piece;
         best.x=move.x;
