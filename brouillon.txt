@@ -1,5 +1,4 @@
 Improvements:
-- update grid that do not change the whole grid
 - clean_way / clean_way_diag useless since we check all possible moves one by one, and break when no more possible
 - minimax algo
 

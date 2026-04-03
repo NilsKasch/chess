@@ -42,9 +42,10 @@ void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece, int *k
             *king_hit=1;
         }
     }
+    grid[pieces[move->piece].x+pieces[move->piece].y*8]=32;
     pieces[move->piece].x += move->x;
     pieces[move->piece].y += move->y;
-    update_grid(pieces, grid);
+    grid[pieces[move->piece].x+pieces[move->piece].y*8]=move->piece;
 }
 
 void undo_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
@@ -54,10 +55,14 @@ void undo_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
         pieces[undo_piece->x].value = undo_piece->value;
         pieces[undo_piece->x].x = pieces[move->piece].x;
         pieces[undo_piece->x].y = pieces[move->piece].y;
+        grid[pieces[move->piece].x+pieces[move->piece].y*8]=undo_piece->x;
+    }
+    else{
+        grid[pieces[move->piece].x+pieces[move->piece].y*8]=32;
     }
     pieces[move->piece].x -= move->x;
     pieces[move->piece].y -= move->y;
-    update_grid(pieces, grid);
+    grid[pieces[move->piece].x+pieces[move->piece].y*8]=move->piece;
 }
 
 void keep(Move *best, Move *tmp, short *white){
