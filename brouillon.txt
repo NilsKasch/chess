@@ -1,4 +1,6 @@
 Improvements:
+- incitation à la victoire et pas a faire pat
+- transformation des pions a l'arrivée
 - clean_way / clean_way_diag useless since we check all possible moves one by one, and break when no more possible
 - minimax algo
 

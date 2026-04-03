@@ -158,6 +158,7 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
     //white = your color
     int target_x = pieces[piece].x+move->x;
     int target_y = pieces[piece].y+move->y;
+    grid[pieces[piece].x + pieces[piece].y*8] = 32;
     Move tmp={};
     for (int i = 8 + *white*8 ; i < 24 + *white*8 ; i++) {
         //printf("%d\n",i);
@@ -167,6 +168,7 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
         if (pieces[i].txt == 'p'){
             if (target_x == pieces[i].x - 1 || target_x == pieces[i].x + 1){
                 if(target_y == pieces[i].y - 1*(*white)){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
                     return  0;
                 }
             }
@@ -174,11 +176,13 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
         else if (pieces[i].txt == 'N'){
             if (target_x == pieces[i].x - 1 || target_x == pieces[i].x + 1){
                 if(target_y == pieces[i].y - 2 || target_y == pieces[i].y + 2){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
                     return  0;
                 }
             }
             if (target_x == pieces[i].x - 2 || target_x == pieces[i].x + 2){
                 if(target_y == pieces[i].y - 1 || target_y == pieces[i].y + 1){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
                     return  0;
                 }
             }
@@ -191,6 +195,7 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
                         tmp.x=target_x-pieces[i].x;
                         tmp.y=target_y-pieces[i].y;
                         if (clean_way_diag(&pieces[i], grid, &tmp)){
+                            grid[pieces[piece].x + pieces[piece].y*8] = piece;
                             return 0;
                         }
                         else{
@@ -207,6 +212,7 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
                     tmp.x=target_x-pieces[i].x;
                     tmp.y=target_y-pieces[i].y;
                     if (clean_way(&pieces[i], grid, &tmp)){
+                        grid[pieces[piece].x + pieces[piece].y*8] = piece;
                         return 0;
                     }
                     else{
@@ -218,6 +224,7 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
                     tmp.x=target_x-pieces[i].x;
                     tmp.y=target_y-pieces[i].y;
                     if (clean_way(&pieces[i], grid, &tmp)){
+                        grid[pieces[piece].x + pieces[piece].y*8] = piece;
                         return 0;
                     }
                     else{
@@ -234,6 +241,7 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
                     tmp.x=target_x-pieces[i].x;
                     tmp.y=target_y-pieces[i].y;
                     if (clean_way(&pieces[i], grid, &tmp)){
+                        grid[pieces[piece].x + pieces[piece].y*8] = piece;
                         return 0;
                     }
                     else{
@@ -245,6 +253,7 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
                     tmp.x=target_x-pieces[i].x;
                     tmp.y=target_y-pieces[i].y;
                     if (clean_way(&pieces[i], grid, &tmp)){
+                        grid[pieces[piece].x + pieces[piece].y*8] = piece;
                         return 0;
                     }
                     else{
@@ -258,6 +267,7 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
                         tmp.x=target_x-pieces[i].x;
                         tmp.y=target_y-pieces[i].y;
                         if (clean_way_diag(&pieces[i], grid, &tmp)){
+                            grid[pieces[piece].x + pieces[piece].y*8] = piece;
                             return 0;
                         }
                         else{
@@ -270,19 +280,23 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
         else if (pieces[i].txt == 'K'){
             //rook
             if ((target_x == pieces[i].x + 1 || target_x == pieces[i].x - 1) && target_y == pieces[i].y){
+                grid[pieces[piece].x + pieces[piece].y*8] = piece;
                 return 0;
             }
             if ((target_y == pieces[i].y + 1 || target_y == pieces[i].y - 1) && target_x == pieces[i].x){
+                grid[pieces[piece].x + pieces[piece].y*8] = piece;
                 return 0;
             }
             //bishop
             if (target_x == pieces[i].x + 1 || target_x == pieces[i].x - 1){
                 if(target_y == pieces[i].y + 1 || target_y == pieces[i].y - 1){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
                     return 0;
                 }
             }
         }
     }
+    grid[pieces[piece].x + pieces[piece].y*8] = piece;
     return 1;
 }
 
@@ -1165,13 +1179,11 @@ int main (int argc, char *argv[]){
     char lettre;
     short white = 1;
     int king_hit = 0;
-    srand(time(NULL));  // Seed
+    srand(6);
+    //srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
         move = next(white,pieces,grid,move,d);
-        lettre = 'a' + pieces[move.piece].x+move.x;
-        //printf("bare move: %c%d%d\n",pieces[move.piece].txt, move.x, move.y);
-        printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
         if (move.x == 0 && move.y == 0){
             if (!not_defended(23-8*white, pieces, grid, &move, &white))
             {
@@ -1183,10 +1195,12 @@ int main (int argc, char *argv[]){
                 }
             }
             else{
-                printf("Pat\n");
+                printf("Stalemate\n");
             }
             break;
         }
+        lettre = 'a' + pieces[move.piece].x+move.x;
+        printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
         apply_move(pieces,grid,&move, &undo_piece, &king_hit);
         plot_grid(pieces,grid);
         printf("\n");
@@ -1194,6 +1208,5 @@ int main (int argc, char *argv[]){
         move.x=0;
         move.y=0;
     }
-    
     return 0;
 }
