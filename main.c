@@ -29,7 +29,7 @@ void update_grid(Piece *pieces, int grid[]){
     }
 }
 
-void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece, int *king_hit){
+void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
     //Don't work with x=0 and y=0 move
     int target=grid[(pieces[move->piece].x+(move->x))+(pieces[move->piece].y+(move->y))*8];
     if (target!=32){
@@ -38,9 +38,6 @@ void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece, int *k
         undo_piece->x = target;
         undo_piece->y = target;
         pieces[target].value=-1;
-        if (target == 15 || target == 31){
-            *king_hit=1;
-        }
     }
     grid[pieces[move->piece].x+pieces[move->piece].y*8]=32;
     pieces[move->piece].x += move->x;
@@ -310,7 +307,7 @@ int not_defended_fast(int piece, Piece pieces[], int grid[], Move *move, short *
     Move tmp={};
     Piece start_piece = pieces[piece];
     //BISHOP
-    for (int x=0; x<8; x++){
+    for (int x=2; x<8; x++){
         tmp.x=x;
         tmp.y=x;
         if (!is_on_the_board(&start_piece,&tmp)){
@@ -353,10 +350,9 @@ int not_defended_fast(int piece, Piece pieces[], int grid[], Move *move, short *
 */
 
 int move_defend_king(Piece pieces[], int grid[], Move *move, short *white){
-    int king_hit = 0;
     Piece undo_piece = {};
     Move tmp = {};
-    apply_move(pieces,grid,move, &undo_piece, &king_hit);
+    apply_move(pieces,grid,move, &undo_piece);
     int defended = not_defended(23-8*(*white), pieces, grid, &tmp, white);
     undo_move(pieces,grid,move, &undo_piece);
     return defended;
@@ -378,14 +374,13 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     Piece undo_piece = {};
     int fill = 0;
     int equal = 0;
-    int king_hit = 0;
 
     undo_piece.value=-1;
     best.value=-1000*white;
     if (move.x != 0 || move.y != 0){
-        apply_move(pieces,grid,&move, &undo_piece, &king_hit);
+        apply_move(pieces,grid,&move, &undo_piece);
     }
-    if (depth == 0 || king_hit){
+    if (depth == 0){
         best.piece=move.piece;
         best.x=move.x;
         best.y=move.y;
@@ -756,11 +751,16 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
         }
     }
-    undo_move(pieces,grid,&move, &undo_piece);
     // select
     if (fill==0){
+        if (not_defended(23-8*white, pieces, grid, &best, &white)){
+            //stalemate
+            best.value=0;
+        }
+        undo_move(pieces,grid,&move, &undo_piece);
         return best;
     }
+    undo_move(pieces,grid,&move, &undo_piece);
     best = possible[0];
     for (int i=0; i < fill; i++){
         if (possible[i].value*white > best.value*white){
@@ -859,7 +859,6 @@ int main (int argc, char *argv[]){
     Piece undo_piece = {};
     char lettre;
     short white = 1;
-    int king_hit = 0;
     //srand(6);
     srand(time(NULL));  // Seed
     //main loop
@@ -882,7 +881,8 @@ int main (int argc, char *argv[]){
         }
         lettre = 'a' + pieces[move.piece].x+move.x;
         printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
-        apply_move(pieces,grid,&move, &undo_piece, &king_hit);
+        printf("value: %f\n", move.value);
+        apply_move(pieces,grid,&move, &undo_piece);
         plot_grid(pieces,grid);
         printf("\n");
         white=-white;
