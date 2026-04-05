@@ -139,7 +139,7 @@ int opponent_piece_there(Piece *piece, int grid[], Move *move, short *white){
     int target=grid[piece->x+move->x+(piece->y+move->y)*8];
     if ( 8 + *white*8 <= target && target < 24 + *white*8 )
     {
-        return 1;
+        return target;
     }
     return 0;
 }
@@ -300,6 +300,58 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
     return 1;
 }
 
+/*
+int not_defended_fast(int piece, Piece pieces[], int grid[], Move *move, short *white){
+    //white = your color
+    //int target_x = pieces[piece].x+move->x;
+    //int target_y = pieces[piece].y+move->y;
+    int opponent_piece;
+    //grid[pieces[piece].x + pieces[piece].y*8] = 32;
+    Move tmp={};
+    Piece start_piece = pieces[piece];
+    //BISHOP
+    for (int x=0; x<8; x++){
+        tmp.x=x;
+        tmp.y=x;
+        if (!is_on_the_board(&start_piece,&tmp)){
+            break;
+        }
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece){
+            if (x==1){
+                if (pieces[opponent_piece].txt == 'K' || pieces[opponent_piece].txt == 'p'){
+                    return 0;
+                }
+                else{
+                    break;
+                }
+            }
+            if (pieces[opponent_piece].txt == 'B' || pieces[opponent_piece].txt == 'Q'){
+                return 0;
+            }
+            else{
+                break;
+            }
+        }
+    }
+    //ROOK
+    for (int x=0; x<8; x++){
+        tmp.x=x;
+        tmp.y=0;
+        if (!is_on_the_board(&pieces[i],&tmp)){
+            break;
+        }
+        if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+            tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+            possible[fill]=tmp;
+            fill += 1;
+        }
+    }
+    //grid[pieces[piece].x + pieces[piece].y*8] = piece;
+    return 1;
+}
+*/
+
 int move_defend_king(Piece pieces[], int grid[], Move *move, short *white){
     int king_hit = 0;
     Piece undo_piece = {};
@@ -446,7 +498,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
         }
         else if (pieces[i].txt == 'B'){
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=x;
                 tmp.y=x;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -458,7 +510,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                     fill += 1;
                 }
             }
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=-x;
                 tmp.y=x;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -470,7 +522,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                     fill += 1;
                 }
             }
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=x;
                 tmp.y=-x;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -482,7 +534,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                     fill += 1;
                 }
             }
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=-x;
                 tmp.y=-x;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -496,7 +548,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             }
         }
         else if (pieces[i].txt == 'R'){
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=x;
                 tmp.y=0;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -508,7 +560,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                     fill += 1;
                 }
             }
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=-x;
                 tmp.y=0;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -520,7 +572,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                     fill += 1;
                 }
             }
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=0;
                 tmp.y=x;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -532,7 +584,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                     fill += 1;
                 }
             }
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=0;
                 tmp.y=-x;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -547,7 +599,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
         }
         else if (pieces[i].txt == 'Q'){
             //BISHOP
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=x;
                 tmp.y=x;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -559,7 +611,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                     fill += 1;
                 }
             }
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=-x;
                 tmp.y=x;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -571,7 +623,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                     fill += 1;
                 }
             }
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=x;
                 tmp.y=-x;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -583,7 +635,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                     fill += 1;
                 }
             }
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=-x;
                 tmp.y=-x;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -596,7 +648,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
             }
             //ROOK
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=x;
                 tmp.y=0;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -608,7 +660,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                     fill += 1;
                 }
             }
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=-x;
                 tmp.y=0;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -620,7 +672,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                     fill += 1;
                 }
             }
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=0;
                 tmp.y=x;
                 if (!is_on_the_board(&pieces[i],&tmp)){
@@ -632,7 +684,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                     fill += 1;
                 }
             }
-            for (int x=0; x<8; x++){
+            for (int x=1; x<8; x++){
                 tmp.x=0;
                 tmp.y=-x;
                 if (!is_on_the_board(&pieces[i],&tmp)){
