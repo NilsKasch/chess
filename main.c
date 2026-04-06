@@ -151,7 +151,7 @@ int opponent_or_free_there(Piece *piece, int grid[], Move *move, short *white){
     return 0;
 }
 
-int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white){
+int not_defended_slow(int piece, Piece pieces[], int grid[], Move *move, short *white){
     //white = your color
     int target_x = pieces[piece].x+move->x;
     int target_y = pieces[piece].y+move->y;
@@ -297,19 +297,16 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
     return 1;
 }
 
-/*
-int not_defended_fast(int piece, Piece pieces[], int grid[], Move *move, short *white){
+int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white){
     //white = your color
-    //int target_x = pieces[piece].x+move->x;
-    //int target_y = pieces[piece].y+move->y;
     int opponent_piece;
-    //grid[pieces[piece].x + pieces[piece].y*8] = 32;
+    grid[pieces[piece].x + pieces[piece].y*8] = 32;
     Move tmp={};
     Piece start_piece = pieces[piece];
-    //BISHOP
-    for (int x=2; x<8; x++){
-        tmp.x=x;
-        tmp.y=x;
+    for (int x=1; x<8; x++){
+        //BISHOP
+        tmp.x=move->x + x;
+        tmp.y=move->y + x*(*white);
         if (!is_on_the_board(&start_piece,&tmp)){
             break;
         }
@@ -319,43 +316,239 @@ int not_defended_fast(int piece, Piece pieces[], int grid[], Move *move, short *
                 if (pieces[opponent_piece].txt == 'K' || pieces[opponent_piece].txt == 'p'){
                     return 0;
                 }
-                else{
-                    break;
+            }
+            if (pieces[opponent_piece].txt == 'B' || pieces[opponent_piece].txt == 'Q'){
+                return 0;
+            }
+        }
+        if(piece_there(&start_piece, grid, &tmp)!=32){
+            break;
+        }
+    }
+    for (int x=1; x<8; x++){
+        tmp.x=move->x - x;
+        tmp.y=move->y + x*(*white);
+        if (!is_on_the_board(&start_piece,&tmp)){
+            break;
+        }
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece){
+            if (x==1){
+                if (pieces[opponent_piece].txt == 'K' || pieces[opponent_piece].txt == 'p'){
+                    return 0;
                 }
             }
             if (pieces[opponent_piece].txt == 'B' || pieces[opponent_piece].txt == 'Q'){
                 return 0;
             }
-            else{
-                break;
+        }
+        if(piece_there(&start_piece, grid, &tmp)!=32){
+            break;
+        }
+    }
+    for (int x=1; x<8; x++){
+        tmp.x=move->x + x;
+        tmp.y=move->y - x*(*white);
+        if (!is_on_the_board(&start_piece,&tmp)){
+            break;
+        }
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece){
+            if (x==1){
+                if (pieces[opponent_piece].txt == 'K'){
+                    return 0;
+                }
             }
+            if (pieces[opponent_piece].txt == 'B' || pieces[opponent_piece].txt == 'Q'){
+                return 0;
+            }
+        }
+        if(piece_there(&start_piece, grid, &tmp)!=32){
+            break;
+        }
+    }
+    for (int x=1; x<8; x++){
+        tmp.x=move->x - x;
+        tmp.y=move->y - x*(*white);
+        if (!is_on_the_board(&start_piece,&tmp)){
+            break;
+        }
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece){
+            if (x==1){
+                if (pieces[opponent_piece].txt == 'K'){
+                    return 0;
+                }
+            }
+            if (pieces[opponent_piece].txt == 'B' || pieces[opponent_piece].txt == 'Q'){
+                return 0;
+            }
+        }
+        if(piece_there(&start_piece, grid, &tmp)!=32){
+            break;
         }
     }
     //ROOK
-    for (int x=0; x<8; x++){
-        tmp.x=x;
-        tmp.y=0;
-        if (!is_on_the_board(&pieces[i],&tmp)){
+    for (int x=1; x<8; x++){
+        tmp.x=move->x + x;
+        tmp.y=move->y;
+        if (!is_on_the_board(&start_piece,&tmp)){
             break;
         }
-        if (clean_way(&pieces[i], grid, &tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-            tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-            possible[fill]=tmp;
-            fill += 1;
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece){
+            if (x==1){
+                if (pieces[opponent_piece].txt == 'K'){
+                    return 0;
+                }
+            }
+            if (pieces[opponent_piece].txt == 'R' || pieces[opponent_piece].txt == 'Q'){
+                return 0;
+            }
+        }
+        if(piece_there(&start_piece, grid, &tmp)!=32){
+            break;
         }
     }
-    //grid[pieces[piece].x + pieces[piece].y*8] = piece;
+    for (int x=1; x<8; x++){
+        tmp.x=move->x - x;
+        tmp.y=move->y;
+        if (!is_on_the_board(&start_piece,&tmp)){
+            break;
+        }
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece){
+            if (x==1){
+                if (pieces[opponent_piece].txt == 'K'){
+                    return 0;
+                }
+            }
+            if (pieces[opponent_piece].txt == 'R' || pieces[opponent_piece].txt == 'Q'){
+                return 0;
+            }
+        }
+        if(piece_there(&start_piece, grid, &tmp)!=32){
+            break;
+        }
+    }
+    for (int x=1; x<8; x++){
+        tmp.x=move->x;
+        tmp.y=move->y + x;
+        if (!is_on_the_board(&start_piece,&tmp)){
+            break;
+        }
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece){
+            if (x==1){
+                if (pieces[opponent_piece].txt == 'K'){
+                    return 0;
+                }
+            }
+            if (pieces[opponent_piece].txt == 'R' || pieces[opponent_piece].txt == 'Q'){
+                return 0;
+            }
+        }
+        if(piece_there(&start_piece, grid, &tmp)!=32){
+            break;
+        }
+    }
+    for (int x=1; x<8; x++){
+        tmp.x=move->x;
+        tmp.y=move->y - x;
+        if (!is_on_the_board(&start_piece,&tmp)){
+            break;
+        }
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece){
+            if (x==1){
+                if (pieces[opponent_piece].txt == 'K'){
+                    return 0;
+                }
+            }
+            if (pieces[opponent_piece].txt == 'R' || pieces[opponent_piece].txt == 'Q'){
+                return 0;
+            }
+        }
+        if(piece_there(&start_piece, grid, &tmp)!=32){
+            break;
+        }
+    }
+    //Knight
+    tmp.x=move->x + 1;
+    tmp.y=move->y + 2;
+    if (is_on_the_board(&start_piece,&tmp)){
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+            return 0;
+        }
+    }
+    tmp.x=move->x - 1;
+    tmp.y=move->y + 2;
+    if (is_on_the_board(&start_piece,&tmp)){
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+            return 0;
+        }
+    }
+    tmp.x=move->x + 1;
+    tmp.y=move->y - 2;
+    if (is_on_the_board(&start_piece,&tmp)){
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+            return 0;
+        }
+    }
+    tmp.x=move->x - 1;
+    tmp.y=move->y - 2;
+    if (is_on_the_board(&start_piece,&tmp)){
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+            return 0;
+        }
+    }
+    tmp.x=move->x + 2;
+    tmp.y=move->y + 1;
+    if (is_on_the_board(&start_piece,&tmp)){
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+            return 0;
+        }
+    }
+    tmp.x=move->x - 2;
+    tmp.y=move->y + 1;
+    if (is_on_the_board(&start_piece,&tmp)){
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+            return 0;
+        }
+    }
+    tmp.x=move->x + 2;
+    tmp.y=move->y - 1;
+    if (is_on_the_board(&start_piece,&tmp)){
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+            return 0;
+        }
+    }
+    tmp.x=move->x - 2;
+    tmp.y=move->y - 1;
+    if (is_on_the_board(&start_piece,&tmp)){
+        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
+        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+            return 0;
+        }
+    }
+    grid[pieces[piece].x + pieces[piece].y*8] = piece;
     return 1;
 }
-*/
 
 int move_defend_king(Piece pieces[], int grid[], Move *move, short *white){
     Piece undo_piece = {};
     Move tmp = {};
     apply_move(pieces,grid,move, &undo_piece);
-    int defended = not_defended(23-8*(*white), pieces, grid, &tmp, white);
+    int not_attacked = not_defended(23-8*(*white), pieces, grid, &tmp, white);
     undo_move(pieces,grid,move, &undo_piece);
-    return defended;
+    return not_attacked;
 }
 
 Move next(short white, Piece *pieces, int grid[], Move move, int depth){
@@ -695,56 +888,56 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
         else if (pieces[i].txt == 'K'){
             tmp.x=1;
             tmp.y=0;
-            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
             }
             tmp.x=1;
             tmp.y=1;
-            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
             }
             tmp.x=0;
             tmp.y=1;
-            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
             }
             tmp.x=-1;
             tmp.y=1;
-            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
             }
             tmp.x=-1;
             tmp.y=0;
-            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
             }
             tmp.x=-1;
             tmp.y=-1;
-            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
             }
             tmp.x=0;
             tmp.y=-1;
-            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
             }
             tmp.x=1;
             tmp.y=-1;
-            if (is_on_the_board(&pieces[i],&tmp) && not_defended(i, pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
