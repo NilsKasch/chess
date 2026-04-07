@@ -97,3 +97,216 @@ void plot_board(Piece *pieces, int grid[]){
         }
     }
 }
+
+
+
+
+////////// OLD ////////////
+
+
+int not_defended_slow(int piece, Piece pieces[], int grid[], Move *move, short *white){
+    //white = your color
+    int target_x = pieces[piece].x+move->x;
+    int target_y = pieces[piece].y+move->y;
+    grid[pieces[piece].x + pieces[piece].y*8] = 32;
+    Move tmp={};
+    for (int i = 8 + *white*8 ; i < 24 + *white*8 ; i++) {
+        //printf("%d\n",i);
+        if (pieces[i].value < 0){
+            continue;
+        }
+        if (pieces[i].txt == 'p'){
+            if (target_x == pieces[i].x - 1 || target_x == pieces[i].x + 1){
+                if(target_y == pieces[i].y - 1*(*white)){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
+                    return  0;
+                }
+            }
+        }
+        else if (pieces[i].txt == 'N'){
+            if (target_x == pieces[i].x - 1 || target_x == pieces[i].x + 1){
+                if(target_y == pieces[i].y - 2 || target_y == pieces[i].y + 2){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
+                    return  0;
+                }
+            }
+            if (target_x == pieces[i].x - 2 || target_x == pieces[i].x + 2){
+                if(target_y == pieces[i].y - 1 || target_y == pieces[i].y + 1){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
+                    return  0;
+                }
+            }
+        }
+        else if (pieces[i].txt == 'B'){
+            for (int x=1; x<8; x++){
+                if (target_x == pieces[i].x + x || target_x == pieces[i].x - x){
+                    if(target_y == pieces[i].y + x || target_y == pieces[i].y - x){
+                        tmp.piece=i;
+                        tmp.x=target_x-pieces[i].x;
+                        tmp.y=target_y-pieces[i].y;
+                        if (clean_way_diag(&pieces[i], grid, &tmp)){
+                            grid[pieces[piece].x + pieces[piece].y*8] = piece;
+                            return 0;
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        else if (pieces[i].txt == 'R'){
+            for (int x=1; x<8; x++){
+                if ((target_x == pieces[i].x + x || target_x == pieces[i].x - x) && target_y == pieces[i].y){
+                    tmp.piece=i;
+                    tmp.x=target_x-pieces[i].x;
+                    tmp.y=target_y-pieces[i].y;
+                    if (clean_way(&pieces[i], grid, &tmp)){
+                        grid[pieces[piece].x + pieces[piece].y*8] = piece;
+                        return 0;
+                    }
+                    else{
+                        break;
+                    }
+                }
+                if ((target_y == pieces[i].y + x || target_y == pieces[i].y - x) && target_x == pieces[i].x){
+                    tmp.piece=i;
+                    tmp.x=target_x-pieces[i].x;
+                    tmp.y=target_y-pieces[i].y;
+                    if (clean_way(&pieces[i], grid, &tmp)){
+                        grid[pieces[piece].x + pieces[piece].y*8] = piece;
+                        return 0;
+                    }
+                    else{
+                        break;
+                    }
+                }
+            }
+        }
+        else if (pieces[i].txt == 'Q'){
+            for (int x=1; x<8; x++){
+                //rook
+                if ((target_x == pieces[i].x + x || target_x == pieces[i].x - x) && target_y == pieces[i].y){
+                    tmp.piece=i;
+                    tmp.x=target_x-pieces[i].x;
+                    tmp.y=target_y-pieces[i].y;
+                    if (clean_way(&pieces[i], grid, &tmp)){
+                        grid[pieces[piece].x + pieces[piece].y*8] = piece;
+                        return 0;
+                    }
+                    else{
+                        break;
+                    }
+                }
+                if ((target_y == pieces[i].y + x || target_y == pieces[i].y - x) && target_x == pieces[i].x){
+                    tmp.piece=i;
+                    tmp.x=target_x-pieces[i].x;
+                    tmp.y=target_y-pieces[i].y;
+                    if (clean_way(&pieces[i], grid, &tmp)){
+                        grid[pieces[piece].x + pieces[piece].y*8] = piece;
+                        return 0;
+                    }
+                    else{
+                        break;
+                    }
+                }
+                //bishop
+                if (target_x == pieces[i].x + x || target_x == pieces[i].x - x){
+                    if(target_y == pieces[i].y + x || target_y == pieces[i].y - x){
+                        tmp.piece=i;
+                        tmp.x=target_x-pieces[i].x;
+                        tmp.y=target_y-pieces[i].y;
+                        if (clean_way_diag(&pieces[i], grid, &tmp)){
+                            grid[pieces[piece].x + pieces[piece].y*8] = piece;
+                            return 0;
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        else if (pieces[i].txt == 'K'){
+            //rook
+            if ((target_x == pieces[i].x + 1 || target_x == pieces[i].x - 1) && target_y == pieces[i].y){
+                grid[pieces[piece].x + pieces[piece].y*8] = piece;
+                return 0;
+            }
+            if ((target_y == pieces[i].y + 1 || target_y == pieces[i].y - 1) && target_x == pieces[i].x){
+                grid[pieces[piece].x + pieces[piece].y*8] = piece;
+                return 0;
+            }
+            //bishop
+            if (target_x == pieces[i].x + 1 || target_x == pieces[i].x - 1){
+                if(target_y == pieces[i].y + 1 || target_y == pieces[i].y - 1){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
+                    return 0;
+                }
+            }
+        }
+    }
+    grid[pieces[piece].x + pieces[piece].y*8] = piece;
+    return 1;
+}
+
+
+
+void keep(Move *best, Move *tmp, short *white){
+    if ((best->value)*(*white) < (tmp->value)*(*white))
+    {
+        best->value = tmp->value;
+        best->piece = tmp->piece;
+        best->x = tmp->x;
+        best->y = tmp->y;
+    }
+    else if ((best->value) == (tmp->value))
+    {
+        best->value = tmp->value;
+        best->piece = tmp->piece;
+        best->x = tmp->x;
+        best->y = tmp->y;
+    }
+}
+
+
+
+
+int sign(int a){
+    return a >= 0 ? 1 : -1;
+}
+
+int clean_full_way(Piece *piece, int grid[], Move *move){
+    for (int x=0; x <= abs(move->x); x++){
+        for (int y=0; y <= abs(move->y); y++){
+            if ((x!=0 || y!=0) && grid[piece->x+x*sign(move->x)+(piece->y+y*sign(move->y))*8]!=32){
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+int max(int a, int b){
+    return a > b ? a : b;
+}
+
+int clean_way_diag(Piece *piece, int grid[], Move *move){
+    for (int x=1; x <= max(abs(move->x)-1,0); x++){
+        if (grid[piece->x+x*sign(move->x)+(piece->y+x*sign(move->y))*8]!=32){
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int clean_way(Piece *piece, int grid[], Move *move){
+    for (int x=0; x <= max(abs(move->x)-1,0); x++){
+        for (int y=0; y <= max(abs(move->y)-1,0); y++){
+            if ((x!=0 || y!=0) && grid[piece->x+x*sign(move->x)+(piece->y+y*sign(move->y))*8]!=32){
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
