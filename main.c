@@ -42,6 +42,18 @@ void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
     grid[pieces[move->piece].x+pieces[move->piece].y*8]=32;
     pieces[move->piece].x += move->x;
     pieces[move->piece].y += move->y;
+    if (move->transform){
+        pieces[move->piece].txt = move->transform;
+        if(move->transform == 'Q'){
+            pieces[move->piece].value = 9;
+        }
+        else if(move->transform == 'R'){
+            pieces[move->piece].value = 5;
+        }
+        else{
+            pieces[move->piece].value = 3;
+        }
+    }
     grid[pieces[move->piece].x+pieces[move->piece].y*8]=move->piece;
 }
 
@@ -59,6 +71,10 @@ void undo_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
     }
     pieces[move->piece].x -= move->x;
     pieces[move->piece].y -= move->y;
+    if (move->transform){
+        pieces[move->piece].txt = 'p';
+        pieces[move->piece].value = 1;
+    }
     grid[pieces[move->piece].x+pieces[move->piece].y*8]=move->piece;
 }
 
@@ -416,18 +432,40 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             tmp.y=1*white;
             if (piece_there(&pieces[i], grid, &tmp)==32 && move_defend_king(pieces, grid, &tmp, &white))
             {
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
-                // move forward +2
-                if ((white==1 && pieces[i].y==1) || (white==-1 && pieces[i].y==6)){
-                    tmp.x=0;
-                    tmp.y=2*white;
-                    if (move_defend_king(pieces, grid, &tmp, &white))
-                    {
-                        tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                        possible[fill]=tmp;
-                        fill += 1;
+                // transform into another piece
+                if ((white == 1 && pieces[i].y == 6) || (white == -1 && pieces[i].y == 1)){
+                    tmp.transform = 'Q';
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                    tmp.transform = 'R';
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                    tmp.transform = 'B';
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                    tmp.transform = 'N';
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                    tmp.transform = 0;
+                }
+                else{
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                    // move forward +2
+                    if ((white==1 && pieces[i].y==1) || (white==-1 && pieces[i].y==6)){
+                        tmp.x=0;
+                        tmp.y=2*white;
+                        if (move_defend_king(pieces, grid, &tmp, &white))
+                        {
+                            tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                            possible[fill]=tmp;
+                            fill += 1;
+                        }
                     }
                 }
             }
@@ -436,6 +474,26 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             tmp.y=1*white;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white))
             {
+                // transform into another piece
+                if ((white == 1 && pieces[i].y == 6) || (white == -1 && pieces[i].y == 1)){
+                    tmp.transform = 'Q';
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                    tmp.transform = 'R';
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                    tmp.transform = 'B';
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                    tmp.transform = 'N';
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                    tmp.transform = 0;
+                }
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
@@ -445,6 +503,26 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             tmp.y=1*white;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white))
             {
+                // transform into another piece
+                if ((white == 1 && pieces[i].y == 6) || (white == -1 && pieces[i].y == 1)){
+                    tmp.transform = 'Q';
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                    tmp.transform = 'R';
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                    tmp.transform = 'B';
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                    tmp.transform = 'N';
+                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
+                    possible[fill]=tmp;
+                    fill += 1;
+                    tmp.transform = 0;
+                }
                 tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
                 possible[fill]=tmp;
                 fill += 1;
@@ -963,6 +1041,7 @@ int main (int argc, char *argv[]){
         printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
         printf("value: %f\n", move.value);
         apply_move(pieces,grid,&move, &undo_piece);
+        move.transform = 0;
         plot_grid(pieces,grid);
         printf("\n");
         white=-white;

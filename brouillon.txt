@@ -1,7 +1,7 @@
 Improvements:
-- not defended et move defend king a faire a l'envers: en partant de la pièce !
-- transformation des pions a l'arrivée
-- clean_way / clean_way_diag useless since we check all possible moves one by one, and break when no more possible
+- prise en passant
+- rock
+- max 3 répétitions, et max 50 coups sans mouvement de pions ni prises
 - minimax algo
 
 
