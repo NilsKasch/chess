@@ -136,7 +136,7 @@ int opponent_piece_there(Piece *piece, int grid[], Move *move, short *white){
     int target=grid[piece->x+move->x+(piece->y+move->y)*8];
     if ( 8 + *white*8 <= target && target < 24 + *white*8 )
     {
-        return target;
+        return 1;
     }
     return 0;
 }
@@ -299,7 +299,7 @@ int not_defended_slow(int piece, Piece pieces[], int grid[], Move *move, short *
 
 int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white){
     //white = your color
-    int opponent_piece;
+    int test_piece;
     grid[pieces[piece].x + pieces[piece].y*8] = 32;
     Move tmp={};
     Piece start_piece = pieces[piece];
@@ -310,18 +310,20 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
         if (!is_on_the_board(&start_piece,&tmp)){
             break;
         }
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if ( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ){
             if (x==1){
-                if (pieces[opponent_piece].txt == 'K' || pieces[opponent_piece].txt == 'p'){
+                if (pieces[test_piece].txt == 'K' || pieces[test_piece].txt == 'p'){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
                     return 0;
                 }
             }
-            if (pieces[opponent_piece].txt == 'B' || pieces[opponent_piece].txt == 'Q'){
+            if (pieces[test_piece].txt == 'B' || pieces[test_piece].txt == 'Q'){
+                grid[pieces[piece].x + pieces[piece].y*8] = piece;
                 return 0;
             }
         }
-        if(piece_there(&start_piece, grid, &tmp)!=32){
+        if(test_piece!=32){
             break;
         }
     }
@@ -331,18 +333,20 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
         if (!is_on_the_board(&start_piece,&tmp)){
             break;
         }
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if ( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ){
             if (x==1){
-                if (pieces[opponent_piece].txt == 'K' || pieces[opponent_piece].txt == 'p'){
+                if (pieces[test_piece].txt == 'K' || pieces[test_piece].txt == 'p'){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
                     return 0;
                 }
             }
-            if (pieces[opponent_piece].txt == 'B' || pieces[opponent_piece].txt == 'Q'){
+            if (pieces[test_piece].txt == 'B' || pieces[test_piece].txt == 'Q'){
+                grid[pieces[piece].x + pieces[piece].y*8] = piece;
                 return 0;
             }
         }
-        if(piece_there(&start_piece, grid, &tmp)!=32){
+        if(test_piece!=32){
             break;
         }
     }
@@ -352,18 +356,20 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
         if (!is_on_the_board(&start_piece,&tmp)){
             break;
         }
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if ( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ){
             if (x==1){
-                if (pieces[opponent_piece].txt == 'K'){
+                if (pieces[test_piece].txt == 'K'){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
                     return 0;
                 }
             }
-            if (pieces[opponent_piece].txt == 'B' || pieces[opponent_piece].txt == 'Q'){
+            if (pieces[test_piece].txt == 'B' || pieces[test_piece].txt == 'Q'){
+                grid[pieces[piece].x + pieces[piece].y*8] = piece;
                 return 0;
             }
         }
-        if(piece_there(&start_piece, grid, &tmp)!=32){
+        if(test_piece!=32){
             break;
         }
     }
@@ -373,18 +379,20 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
         if (!is_on_the_board(&start_piece,&tmp)){
             break;
         }
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if ( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ){
             if (x==1){
-                if (pieces[opponent_piece].txt == 'K'){
+                if (pieces[test_piece].txt == 'K'){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
                     return 0;
                 }
             }
-            if (pieces[opponent_piece].txt == 'B' || pieces[opponent_piece].txt == 'Q'){
+            if (pieces[test_piece].txt == 'B' || pieces[test_piece].txt == 'Q'){
+                grid[pieces[piece].x + pieces[piece].y*8] = piece;
                 return 0;
             }
         }
-        if(piece_there(&start_piece, grid, &tmp)!=32){
+        if(test_piece!=32){
             break;
         }
     }
@@ -395,18 +403,20 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
         if (!is_on_the_board(&start_piece,&tmp)){
             break;
         }
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if ( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ){
             if (x==1){
-                if (pieces[opponent_piece].txt == 'K'){
+                if (pieces[test_piece].txt == 'K'){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
                     return 0;
                 }
             }
-            if (pieces[opponent_piece].txt == 'R' || pieces[opponent_piece].txt == 'Q'){
+            if (pieces[test_piece].txt == 'R' || pieces[test_piece].txt == 'Q'){
+                grid[pieces[piece].x + pieces[piece].y*8] = piece;
                 return 0;
             }
         }
-        if(piece_there(&start_piece, grid, &tmp)!=32){
+        if(test_piece!=32){
             break;
         }
     }
@@ -416,18 +426,20 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
         if (!is_on_the_board(&start_piece,&tmp)){
             break;
         }
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if ( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ){
             if (x==1){
-                if (pieces[opponent_piece].txt == 'K'){
+                if (pieces[test_piece].txt == 'K'){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
                     return 0;
                 }
             }
-            if (pieces[opponent_piece].txt == 'R' || pieces[opponent_piece].txt == 'Q'){
+            if (pieces[test_piece].txt == 'R' || pieces[test_piece].txt == 'Q'){
+                grid[pieces[piece].x + pieces[piece].y*8] = piece;
                 return 0;
             }
         }
-        if(piece_there(&start_piece, grid, &tmp)!=32){
+        if(test_piece!=32){
             break;
         }
     }
@@ -437,18 +449,20 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
         if (!is_on_the_board(&start_piece,&tmp)){
             break;
         }
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if ( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ){
             if (x==1){
-                if (pieces[opponent_piece].txt == 'K'){
+                if (pieces[test_piece].txt == 'K'){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
                     return 0;
                 }
             }
-            if (pieces[opponent_piece].txt == 'R' || pieces[opponent_piece].txt == 'Q'){
+            if (pieces[test_piece].txt == 'R' || pieces[test_piece].txt == 'Q'){
+                grid[pieces[piece].x + pieces[piece].y*8] = piece;
                 return 0;
             }
         }
-        if(piece_there(&start_piece, grid, &tmp)!=32){
+        if(test_piece!=32){
             break;
         }
     }
@@ -458,18 +472,20 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
         if (!is_on_the_board(&start_piece,&tmp)){
             break;
         }
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if ( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ){
             if (x==1){
-                if (pieces[opponent_piece].txt == 'K'){
+                if (pieces[test_piece].txt == 'K'){
+                    grid[pieces[piece].x + pieces[piece].y*8] = piece;
                     return 0;
                 }
             }
-            if (pieces[opponent_piece].txt == 'R' || pieces[opponent_piece].txt == 'Q'){
+            if (pieces[test_piece].txt == 'R' || pieces[test_piece].txt == 'Q'){
+                grid[pieces[piece].x + pieces[piece].y*8] = piece;
                 return 0;
             }
         }
-        if(piece_there(&start_piece, grid, &tmp)!=32){
+        if(test_piece!=32){
             break;
         }
     }
@@ -477,64 +493,72 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
     tmp.x=move->x + 1;
     tmp.y=move->y + 2;
     if (is_on_the_board(&start_piece,&tmp)){
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if (( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ) && pieces[test_piece].txt == 'N'){
+            grid[pieces[piece].x + pieces[piece].y*8] = piece;
             return 0;
         }
     }
     tmp.x=move->x - 1;
     tmp.y=move->y + 2;
     if (is_on_the_board(&start_piece,&tmp)){
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if (( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ) && pieces[test_piece].txt == 'N'){
+            grid[pieces[piece].x + pieces[piece].y*8] = piece;
             return 0;
         }
     }
     tmp.x=move->x + 1;
     tmp.y=move->y - 2;
     if (is_on_the_board(&start_piece,&tmp)){
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if (( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ) && pieces[test_piece].txt == 'N'){
+            grid[pieces[piece].x + pieces[piece].y*8] = piece;
             return 0;
         }
     }
     tmp.x=move->x - 1;
     tmp.y=move->y - 2;
     if (is_on_the_board(&start_piece,&tmp)){
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if (( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ) && pieces[test_piece].txt == 'N'){
+            grid[pieces[piece].x + pieces[piece].y*8] = piece;
             return 0;
         }
     }
     tmp.x=move->x + 2;
     tmp.y=move->y + 1;
     if (is_on_the_board(&start_piece,&tmp)){
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if (( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ) && pieces[test_piece].txt == 'N'){
+            grid[pieces[piece].x + pieces[piece].y*8] = piece;
             return 0;
         }
     }
     tmp.x=move->x - 2;
     tmp.y=move->y + 1;
     if (is_on_the_board(&start_piece,&tmp)){
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if (( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ) && pieces[test_piece].txt == 'N'){
+            grid[pieces[piece].x + pieces[piece].y*8] = piece;
             return 0;
         }
     }
     tmp.x=move->x + 2;
     tmp.y=move->y - 1;
     if (is_on_the_board(&start_piece,&tmp)){
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if (( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ) && pieces[test_piece].txt == 'N'){
+            grid[pieces[piece].x + pieces[piece].y*8] = piece;
             return 0;
         }
     }
     tmp.x=move->x - 2;
     tmp.y=move->y - 1;
     if (is_on_the_board(&start_piece,&tmp)){
-        opponent_piece = opponent_piece_there(&start_piece, grid, &tmp, white);
-        if (opponent_piece && pieces[opponent_piece].txt == 'N'){
+        test_piece = piece_there(&start_piece, grid, &tmp);
+        if (( 8 + *white*8 <= test_piece && test_piece < 24 + *white*8 ) && pieces[test_piece].txt == 'N'){
+            grid[pieces[piece].x + pieces[piece].y*8] = piece;
             return 0;
         }
     }
@@ -1052,7 +1076,7 @@ int main (int argc, char *argv[]){
     Piece undo_piece = {};
     char lettre;
     short white = 1;
-    //srand(6);
+    //srand(19); //10 14 15
     srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
