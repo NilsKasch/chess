@@ -836,7 +836,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Move possible[], int
     }
 }
 
-Move next(short white, Piece *pieces, int grid[], Move move, int depth){
+Move next(short white, Piece *pieces, int grid[], int depth){
     /////// SEQ /////////
     //prend en arg une grille et retourne la valeur du meilleur mouve trouvé et le meilleur move
     //parcour chaques moves possibles:
@@ -853,24 +853,27 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     int fill = 0;
     int equal = 0;
 
-    undo_piece.value=-1;
     best.value=-1000*white;
-    if (move.x != 0 || move.y != 0){
-        apply_move(pieces,grid,&move, &undo_piece);
-    }
+
     if (depth == 0){
-        best.piece=move.piece;
-        best.x=move.x;
-        best.y=move.y;
         best.value=eval(pieces);
-        undo_move(pieces,grid,&move, &undo_piece);
         return best;
     }
 
     possible_moves(white, pieces, grid, possible, &fill);
+
     for (int i=0; i < fill; i++){
         tmp = possible[i];
-        possible[i].value = next(-white,pieces, grid, tmp, depth - 1).value;
+        undo_piece.value=-1;
+        if (tmp.x != 0 || tmp.y != 0){
+            apply_move(pieces,grid,&tmp, &undo_piece);
+            possible[i].value = next(-white,pieces, grid, depth - 1).value;
+            undo_move(pieces,grid,&tmp, &undo_piece);
+        }
+        else
+        {
+            possible[i].value = -1000*white;
+        }
     }
 
     // select
@@ -879,10 +882,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             //stalemate
             best.value=0;
         }
-        undo_move(pieces,grid,&move, &undo_piece);
         return best;
     }
-    undo_move(pieces,grid,&move, &undo_piece);
     best = possible[0];
     for (int i=0; i < fill; i++){
         if (possible[i].value*white > best.value*white){
@@ -986,7 +987,7 @@ int main (int argc, char *argv[]){
     srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
-        move = next(white,pieces,grid,move,d);
+        move = next(white,pieces,grid,d);
         if (move.x == 0 && move.y == 0){
             if (!not_defended(23-8*white, pieces, grid, &move, &white))
             {
@@ -1006,12 +1007,9 @@ int main (int argc, char *argv[]){
         printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
         printf("value: %f\n", move.value);
         apply_move(pieces,grid,&move, &undo_piece);
-        move.transform = 0;
         plot_grid(pieces,grid);
         printf("\n");
         white=-white;
-        move.x=0;
-        move.y=0;
     }
     return 0;
 }
