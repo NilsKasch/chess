@@ -836,7 +836,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Move possible[], int
     }
 }
 
-Move next(short white, Piece *pieces, int grid[], int depth){
+Move next(short white, Piece *pieces, int grid[], float alpha, float beta, int depth){
     /////// SEQ /////////
     //prend en arg une grille et retourne la valeur du meilleur mouve trouvé et le meilleur move
     //parcour chaques moves possibles:
@@ -866,8 +866,24 @@ Move next(short white, Piece *pieces, int grid[], int depth){
         tmp = possible[i];
         undo_piece.value=-1;
         apply_move(pieces,grid,&tmp, &undo_piece);
-        possible[i].value = next(-white,pieces, grid, depth - 1).value;
+        possible[i].value = next(-white,pieces, grid, alpha, beta, depth - 1).value;
         undo_move(pieces,grid,&tmp, &undo_piece);
+        if (white==1)
+        {
+            if (alpha < possible[i].value){
+                alpha = possible[i].value;
+            }
+        }
+        else
+        {
+            if (possible[i].value < beta){
+                beta = possible[i].value;
+            }
+        }
+        if (beta <= alpha){
+            fill = i+1;
+            break;
+        }
     }
 
     // select
@@ -981,7 +997,7 @@ int main (int argc, char *argv[]){
     srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
-        move = next(white,pieces,grid,d);
+        move = next(white,pieces,grid,-100000,100000,d);
         if (move.x == 0 && move.y == 0){
             if (!not_defended(23-8*white, pieces, grid, &move, &white))
             {
