@@ -865,15 +865,9 @@ Move next(short white, Piece *pieces, int grid[], int depth){
     for (int i=0; i < fill; i++){
         tmp = possible[i];
         undo_piece.value=-1;
-        if (tmp.x != 0 || tmp.y != 0){
-            apply_move(pieces,grid,&tmp, &undo_piece);
-            possible[i].value = next(-white,pieces, grid, depth - 1).value;
-            undo_move(pieces,grid,&tmp, &undo_piece);
-        }
-        else
-        {
-            possible[i].value = -1000*white;
-        }
+        apply_move(pieces,grid,&tmp, &undo_piece);
+        possible[i].value = next(-white,pieces, grid, depth - 1).value;
+        undo_move(pieces,grid,&tmp, &undo_piece);
     }
 
     // select
