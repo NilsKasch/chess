@@ -389,37 +389,10 @@ int move_defend_king(Piece pieces[], int grid[], Move *move, short *white){
     return not_attacked;
 }
 
-Move next(short white, Piece *pieces, int grid[], Move move, int depth){
-    /////// SEQ /////////
-    //prend en arg une grille et retourne la valeur du meilleur mouve trouvé et le meilleur move
-    //parcour chaques moves possibles:
-        // do move
-        // La valeur du move est la valeur retournée par next
-        // si la valeur est plus grande que celle des moves calculés on la stoque, et on supprime les autres.
-        // si la valeur est égale, on ajoute au tableau en vu de faire un move aléatoire
-        // undo move
-    Move best = {};
+void possible_moves(short white, Piece *pieces, int grid[], Move possible[], int *fill){
     Move tmp = {};
-    Move possible[138] = {};
-    Move possible_best[138] = {};
-    Piece undo_piece = {};
-    int fill = 0;
-    int equal = 0;
     int test_piece;
 
-    undo_piece.value=-1;
-    best.value=-1000*white;
-    if (move.x != 0 || move.y != 0){
-        apply_move(pieces,grid,&move, &undo_piece);
-    }
-    if (depth == 0){
-        best.piece=move.piece;
-        best.x=move.x;
-        best.y=move.y;
-        best.value=eval(pieces);
-        undo_move(pieces,grid,&move, &undo_piece);
-        return best;
-    }
     for (int i = 8 - white*8 ; i < 24 - white*8 ; i++) {
         //printf("%d\n",i);
         if (pieces[i].value < 0){
@@ -435,36 +408,30 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 // transform into another piece
                 if ((white == 1 && pieces[i].y == 6) || (white == -1 && pieces[i].y == 1)){
                     tmp.transform = 'Q';
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                     tmp.transform = 'R';
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                     tmp.transform = 'B';
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                     tmp.transform = 'N';
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                     tmp.transform = 0;
                 }
                 else{
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                     // move forward +2
                     if ((white==1 && pieces[i].y==1) || (white==-1 && pieces[i].y==6)){
                         tmp.x=0;
                         tmp.y=2*white;
                         if (move_defend_king(pieces, grid, &tmp, &white))
                         {
-                            tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                            possible[fill]=tmp;
-                            fill += 1;
+                            possible[*fill]=tmp;
+                            *fill += 1;
                         }
                     }
                 }
@@ -477,26 +444,21 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 // transform into another piece
                 if ((white == 1 && pieces[i].y == 6) || (white == -1 && pieces[i].y == 1)){
                     tmp.transform = 'Q';
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                     tmp.transform = 'R';
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                     tmp.transform = 'B';
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                     tmp.transform = 'N';
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                     tmp.transform = 0;
                 }
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             // eat on the right (for white, and left for black)
             tmp.x=1;
@@ -506,84 +468,71 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 // transform into another piece
                 if ((white == 1 && pieces[i].y == 6) || (white == -1 && pieces[i].y == 1)){
                     tmp.transform = 'Q';
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                     tmp.transform = 'R';
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                     tmp.transform = 'B';
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                     tmp.transform = 'N';
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                     tmp.transform = 0;
                 }
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
         }
         else if (pieces[i].txt == 'N'){
             tmp.x=1;
             tmp.y=2;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             tmp.x=-1;
             tmp.y=2;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             tmp.x=1;
             tmp.y=-2;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             tmp.x=-1;
             tmp.y=-2;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             tmp.x=2;
             tmp.y=1;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             tmp.x=2;
             tmp.y=-1;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             tmp.x=-2;
             tmp.y=1;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             tmp.x=-2;
             tmp.y=-1;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
         }
         else if (pieces[i].txt == 'B'){
@@ -595,9 +544,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -611,9 +559,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -627,9 +574,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -643,9 +589,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -661,9 +606,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -677,9 +621,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -693,9 +636,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -709,9 +651,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -728,9 +669,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -744,9 +684,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -760,9 +699,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -776,9 +714,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -793,9 +730,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -809,9 +745,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -825,9 +760,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -841,9 +775,8 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
                 if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
-                    tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                    possible[fill]=tmp;
-                    fill += 1;
+                    possible[*fill]=tmp;
+                    *fill += 1;
                 }
                 if (test_piece!=32){
                     break;
@@ -854,61 +787,92 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
             tmp.x=1;
             tmp.y=0;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             tmp.x=1;
             tmp.y=1;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             tmp.x=0;
             tmp.y=1;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             tmp.x=-1;
             tmp.y=1;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             tmp.x=-1;
             tmp.y=0;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             tmp.x=-1;
             tmp.y=-1;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             tmp.x=0;
             tmp.y=-1;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
             tmp.x=1;
             tmp.y=-1;
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
-                tmp.value = next(-white,pieces, grid, tmp, depth - 1).value;
-                possible[fill]=tmp;
-                fill += 1;
+                possible[*fill]=tmp;
+                *fill += 1;
             }
         }
     }
+}
+
+Move next(short white, Piece *pieces, int grid[], Move move, int depth){
+    /////// SEQ /////////
+    //prend en arg une grille et retourne la valeur du meilleur mouve trouvé et le meilleur move
+    //parcour chaques moves possibles:
+        // do move
+        // La valeur du move est la valeur retournée par next
+        // si la valeur est plus grande que celle des moves calculés on la stoque, et on supprime les autres.
+        // si la valeur est égale, on ajoute au tableau en vu de faire un move aléatoire
+        // undo move
+    Move best = {};
+    Move tmp = {};
+    Move possible[138] = {};
+    Move possible_best[138] = {};
+    Piece undo_piece = {};
+    int fill = 0;
+    int equal = 0;
+
+    undo_piece.value=-1;
+    best.value=-1000*white;
+    if (move.x != 0 || move.y != 0){
+        apply_move(pieces,grid,&move, &undo_piece);
+    }
+    if (depth == 0){
+        best.piece=move.piece;
+        best.x=move.x;
+        best.y=move.y;
+        best.value=eval(pieces);
+        undo_move(pieces,grid,&move, &undo_piece);
+        return best;
+    }
+
+    possible_moves(white, pieces, grid, possible, &fill);
+    for (int i=0; i < fill; i++){
+        tmp = possible[i];
+        possible[i].value = next(-white,pieces, grid, tmp, depth - 1).value;
+    }
+
     // select
     if (fill==0){
         if (not_defended(23-8*white, pieces, grid, &best, &white)){
@@ -936,6 +900,7 @@ Move next(short white, Piece *pieces, int grid[], Move move, int depth){
     }
     return best;
 }
+
 
 int main (int argc, char *argv[]){
     int n,d;
