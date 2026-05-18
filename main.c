@@ -880,7 +880,7 @@ Move next(short white, Piece *pieces, int grid[], float alpha, float beta, int d
                 beta = possible[i].value;
             }
         }
-        if (beta <= alpha){
+        if (beta < alpha){
             fill = i+1;
             break;
         }
