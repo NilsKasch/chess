@@ -424,15 +424,19 @@ void possible_moves(short white, Piece *pieces, int grid[], Move possible[], int
                 else{
                     possible[*fill]=tmp;
                     *fill += 1;
-                    // move forward +2
-                    if ((white==1 && pieces[i].y==1) || (white==-1 && pieces[i].y==6)){
-                        tmp.x=0;
-                        tmp.y=2*white;
-                        if (move_defend_king(pieces, grid, &tmp, &white))
-                        {
-                            possible[*fill]=tmp;
-                            *fill += 1;
-                        }
+                }
+            }
+            // move forward +2
+            tmp.x=0;
+            tmp.y=1*white;
+            if (piece_there(&pieces[i], grid, &tmp)==32)
+            {
+                if ((white==1 && pieces[i].y==1) || (white==-1 && pieces[i].y==6)){
+                    tmp.y=2*white;
+                    if (piece_there(&pieces[i], grid, &tmp)==32 && move_defend_king(pieces, grid, &tmp, &white))
+                    {
+                        possible[*fill]=tmp;
+                        *fill += 1;
                     }
                 }
             }
@@ -837,14 +841,10 @@ void possible_moves(short white, Piece *pieces, int grid[], Move possible[], int
 }
 
 Move next(short white, Piece *pieces, int grid[], float alpha, float beta, int depth){
-    /////// SEQ /////////
-    //prend en arg une grille et retourne la valeur du meilleur mouve trouvé et le meilleur move
-    //parcour chaques moves possibles:
-        // do move
-        // La valeur du move est la valeur retournée par next
-        // si la valeur est plus grande que celle des moves calculés on la stoque, et on supprime les autres.
-        // si la valeur est égale, on ajoute au tableau en vu de faire un move aléatoire
-        // undo move
+    /// TODO:
+    // Mettre une limite max au nombre de coups équivalents random gardées 
+    // (= au bout d'un certain nombre de coups, mettre aplha <= beta)
+    // ne plus retourner de move, mais retourner seulement lévaluation de chaque moves.
     Move best = {};
     Move tmp = {};
     Move possible[138] = {};
