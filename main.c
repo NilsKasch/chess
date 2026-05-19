@@ -974,6 +974,7 @@ Move rnd_best_move(short white, Piece *pieces, int grid[],  int depth){
         best=possible[possible_best_index[rnd]];
         best_value=possible_values[possible_best_index[rnd]];
     }
+    printf("value: %f\n", best_value);
     return best;
 }
 
@@ -1079,7 +1080,6 @@ int main (int argc, char *argv[]){
         }
         lettre = 'a' + pieces[move.piece].x+move.x;
         printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
-        printf("value: %f\n", move.value);
         apply_move(pieces,grid,&move, &undo_piece);
         plot_grid(pieces,grid);
         printf("\n");
