@@ -10,7 +10,6 @@ typedef struct {
 typedef struct {
    int piece;
    int x,y;
-   float value;
    char transform;
 }Move;
 
