@@ -840,23 +840,84 @@ void possible_moves(short white, Piece *pieces, int grid[], Move possible[], int
     }
 }
 
-Move next(short white, Piece *pieces, int grid[], float alpha, float beta, int depth){
+float minimax(short white, Piece *pieces, int grid[], float alpha, float beta, int depth){
+    float best = -1000*white;
+    Move tmp = {};
+    Move possible[138] = {};
+    float possible_values[138] = {};
+    Piece undo_piece = {};
+    int fill = 0;
+
+    if (depth == 0){
+        return eval(pieces);
+    }
+
+    possible_moves(white, pieces, grid, possible, &fill);
+
+    for (int i=0; i < fill; i++){
+        tmp = possible[i];
+        undo_piece.value=-1;
+        apply_move(pieces,grid,&tmp, &undo_piece);
+        possible_values[i] = minimax(-white, pieces, grid, alpha, beta, depth - 1);
+        undo_move(pieces,grid,&tmp, &undo_piece);
+        if (white==1)
+        {
+            if (alpha < possible_values[i]){
+                alpha = possible_values[i];
+            }
+        }
+        else
+        {
+            if (possible_values[i] < beta){
+                beta = possible_values[i];
+            }
+        }
+        if (beta < alpha){
+            fill = i+1;
+            break;
+        }
+    }
+
+    // select
+    tmp.x = 0;
+    tmp.y = 0;
+    if (fill==0){
+        if (not_defended(23-8*white, pieces, grid, &tmp, &white)){
+            //stalemate
+            best=0;
+        }
+        return best;
+    }
+    best = possible_values[0];
+    for (int i=0; i < fill; i++){
+        if (possible_values[i]*white > best*white){
+            best = possible_values[i];
+        }
+    }
+    return best;
+}
+
+
+Move rnd_best_move(short white, Piece *pieces, int grid[],  int depth){
     /// TODO:
     // Mettre une limite max au nombre de coups équivalents random gardées 
     // (= au bout d'un certain nombre de coups, mettre aplha <= beta)
     // ne plus retourner de move, mais retourner seulement lévaluation de chaque moves.
     Move best = {};
+    float best_value = -1000*white;
     Move tmp = {};
     Move possible[138] = {};
-    Move possible_best[138] = {};
+    float possible_values[138] = {};
+    int possible_best_index[138] = {};
     Piece undo_piece = {};
+    float alpha = -100000;
+    float beta = 100000;
     int fill = 0;
     int equal = 0;
-
-    best.value=-1000*white;
+    int rnd = 0;
 
     if (depth == 0){
-        best.value=eval(pieces);
+        best_value=eval(pieces);
         return best;
     }
 
@@ -866,18 +927,18 @@ Move next(short white, Piece *pieces, int grid[], float alpha, float beta, int d
         tmp = possible[i];
         undo_piece.value=-1;
         apply_move(pieces,grid,&tmp, &undo_piece);
-        possible[i].value = next(-white,pieces, grid, alpha, beta, depth - 1).value;
+        possible_values[i] = minimax(-white, pieces, grid, alpha, beta, depth - 1);
         undo_move(pieces,grid,&tmp, &undo_piece);
         if (white==1)
         {
-            if (alpha < possible[i].value){
-                alpha = possible[i].value;
+            if (alpha < possible_values[i]){
+                alpha = possible_values[i];
             }
         }
         else
         {
-            if (possible[i].value < beta){
-                beta = possible[i].value;
+            if (possible_values[i] < beta){
+                beta = possible_values[i];
             }
         }
         if (beta < alpha){
@@ -890,28 +951,31 @@ Move next(short white, Piece *pieces, int grid[], float alpha, float beta, int d
     if (fill==0){
         if (not_defended(23-8*white, pieces, grid, &best, &white)){
             //stalemate
-            best.value=0;
+            best_value=0;
         }
         return best;
     }
+    best_value = possible_values[0];
     best = possible[0];
     for (int i=0; i < fill; i++){
-        if (possible[i].value*white > best.value*white){
+        if (possible_values[i]*white > best_value*white){
+            best_value = possible_values[i];
             best = possible[i];
         }
     }
     for (int i=0; i < fill; i++){
-        if (possible[i].value == best.value){
-            possible_best[equal]=possible[i];
+        if (possible_values[i] == best_value){
+            possible_best_index[equal]=i;
             equal += 1;
         }
     }
     if (equal > 1){
-        best=possible_best[rand() % equal];
+        rnd = rand() % equal;
+        best=possible[possible_best_index[rnd]];
+        best_value=possible_values[possible_best_index[rnd]];
     }
     return best;
 }
-
 
 int main (int argc, char *argv[]){
     int n,d;
@@ -989,7 +1053,7 @@ int main (int argc, char *argv[]){
     }
     */
 
-    Move move = {0,0,0,0};
+    Move move = {};
     Piece undo_piece = {};
     char lettre;
     short white = 1;
@@ -997,7 +1061,7 @@ int main (int argc, char *argv[]){
     srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
-        move = next(white,pieces,grid,-100000,100000,d);
+        move = rnd_best_move(white,pieces,grid,d);
         if (move.x == 0 && move.y == 0){
             if (!not_defended(23-8*white, pieces, grid, &move, &white))
             {
