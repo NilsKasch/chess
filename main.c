@@ -872,7 +872,7 @@ float minimax(FILE *file, short white, Piece *pieces, int grid[], float alpha, f
                 beta = possible_values[i];
             }
         }
-        if (beta < alpha){
+        if (beta <= alpha){
             fill = i+1;
             break;
         }
@@ -886,7 +886,7 @@ float minimax(FILE *file, short white, Piece *pieces, int grid[], float alpha, f
             //stalemate
             best=0;
         }
-        if (depth==3){
+        if (depth=1){
             export_data(file,pieces,grid,depth,best);
         }
         return best;
@@ -897,7 +897,7 @@ float minimax(FILE *file, short white, Piece *pieces, int grid[], float alpha, f
             best = possible_values[i];
         }
     }
-    if (depth==3){
+    if (depth==1){
         export_data(file,pieces,grid,depth,best);
     }
     return best;
@@ -1076,6 +1076,7 @@ int main (int argc, char *argv[]){
             printf("Erreur ouverture fichier\n");
             exit(1);
         }
+        fprintf(file, "white: %d\n",white);
         export_data(file,pieces,grid,-1,-1);
 
         move = rnd_best_move(file,white,pieces,grid,d);
