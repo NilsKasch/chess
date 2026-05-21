@@ -941,7 +941,7 @@ Move rnd_best_move(short white, Piece *pieces, int grid[],  int depth){
                 beta = possible_values[i];
             }
         }
-        if (beta < alpha){
+        if (beta <= alpha){
             fill = i+1;
             break;
         }
@@ -1058,8 +1058,8 @@ int main (int argc, char *argv[]){
     Piece undo_piece = {};
     char lettre;
     short white = 1;
-    //srand(19); //10 14 15
-    srand(time(NULL));  // Seed
+    srand(19); //10 14 15
+    //srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
         move = rnd_best_move(white,pieces,grid,d);
