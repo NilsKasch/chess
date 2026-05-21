@@ -100,9 +100,9 @@ void write_grid(FILE *fichier, Piece *pieces, int grid[]){
     }
 }
 
-void export_data(FILE *fichier, Piece *pieces, int grid[], int depth){
+void export_data(FILE *fichier, Piece *pieces, int grid[], int depth, float eval){
 
-    fprintf(fichier, "depth: %d\n", depth);
+    fprintf(fichier, "depth: %d eval: %f\n", depth, eval);
     write_grid(fichier, pieces, grid);
 
 }
