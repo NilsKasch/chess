@@ -840,7 +840,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Move possible[], int
     }
 }
 
-float minimax(short white, Piece *pieces, int grid[], float alpha, float beta, int depth){
+float minimax(FILE *fichier, short white, Piece *pieces, int grid[], float alpha, float beta, int depth){
     float best = -1000*white;
     Move tmp = {};
     Move possible[138] = {};
@@ -853,12 +853,16 @@ float minimax(short white, Piece *pieces, int grid[], float alpha, float beta, i
     }
 
     possible_moves(white, pieces, grid, possible, &fill);
+    // if (depth==3){
+    //     export_data(fichier,pieces,grid,depth);
+    // }
+    export_data(fichier,pieces,grid,depth);
 
     for (int i=0; i < fill; i++){
         tmp = possible[i];
         undo_piece.value=-1;
         apply_move(pieces,grid,&tmp, &undo_piece);
-        possible_values[i] = minimax(-white, pieces, grid, alpha, beta, depth - 1);
+        possible_values[i] = minimax(fichier, -white, pieces, grid, alpha, beta, depth - 1);
         undo_move(pieces,grid,&tmp, &undo_piece);
         if (white==1)
         {
@@ -923,11 +927,20 @@ Move rnd_best_move(short white, Piece *pieces, int grid[],  int depth){
 
     possible_moves(white, pieces, grid, possible, &fill);
 
+    /////////////////////////TMP
+    FILE *fichier = fopen("data.chess", "w");
+
+    if (fichier == NULL) {
+        printf("Erreur ouverture fichier\n");
+        exit(1);
+    }
+    //////////////////////////TMP
+
     for (int i=0; i < fill; i++){
         tmp = possible[i];
         undo_piece.value=-1;
         apply_move(pieces,grid,&tmp, &undo_piece);
-        possible_values[i] = minimax(-white, pieces, grid, alpha, beta, depth - 1);
+        possible_values[i] = minimax(fichier, -white, pieces, grid, alpha, beta, depth - 1);
         undo_move(pieces,grid,&tmp, &undo_piece);
         if (white==1)
         {
@@ -946,6 +959,9 @@ Move rnd_best_move(short white, Piece *pieces, int grid[],  int depth){
             break;
         }
     }
+    //////////////////////////TMP
+    fclose(fichier);
+    //////////////////////////TMP
 
     // select
     if (fill==0){

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "data_rep.h"
 #include "print.h"
 
@@ -79,4 +80,29 @@ void plot_grid(Piece *pieces, int grid[]){
             }
         }
     }
+}
+
+void write_grid(FILE *fichier, Piece *pieces, int grid[]){
+    int i;
+    for (int y = 7; y >= 0; y--){
+        for (int x = 0; x < 8; x++){
+            i = x + 8*y;
+            if (grid[i]==32){
+                fprintf(fichier, ". ");
+            }
+            else{
+                fprintf(fichier, "%s ", get_symbole(&pieces[grid[i]],grid[i]));
+            }
+            if ((i+1)%8==0){
+                fprintf(fichier, "\n");
+            }
+        }
+    }
+}
+
+void export_data(FILE *fichier, Piece *pieces, int grid[], int depth){
+
+    fprintf(fichier, "depth: %d\n", depth);
+    write_grid(fichier, pieces, grid);
+
 }
