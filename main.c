@@ -1068,7 +1068,7 @@ int main (int argc, char *argv[]){
     //main loop
     for (int i = 1; i <= n; i++) {
         //file open
-        snprintf(filename, sizeof(filename),"data_%d.chess", i);
+        snprintf(filename, sizeof(filename),"data/data_%d.chess", i);
         FILE *file = fopen(filename, "w");
         if (file == NULL) {
             printf("Erreur ouverture fichier\n");
