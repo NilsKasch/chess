@@ -37,7 +37,7 @@ void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
         undo_piece->value = pieces[target].value;
         undo_piece->x = target;
         undo_piece->y = target;
-        pieces[target].value=-1;
+        pieces[target].value=0;
     }
     grid[pieces[move->piece].x+pieces[move->piece].y*8]=32;
     pieces[move->piece].x += move->x;
@@ -395,7 +395,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Move possible[], int
 
     for (int i = 8 - white*8 ; i < 24 - white*8 ; i++) {
         //printf("%d\n",i);
-        if (pieces[i].value < 0){
+        if (pieces[i].value == 0){
             continue;
         }
         tmp.piece=i;
@@ -856,7 +856,7 @@ float minimax(FILE *file, short white, Piece *pieces, int grid[], float alpha, f
 
     for (int i=0; i < fill; i++){
         tmp = possible[i];
-        undo_piece.value=-1;
+        undo_piece.value=0;
         apply_move(pieces,grid,&tmp, &undo_piece);
         possible_values[i] = minimax(file, -white, pieces, grid, alpha, beta, depth - 1);
         undo_move(pieces,grid,&tmp, &undo_piece);
@@ -931,7 +931,7 @@ Move rnd_best_move(FILE *file, short white, Piece *pieces, int grid[],  int dept
 
     for (int i=0; i < fill; i++){
         tmp = possible[i];
-        undo_piece.value=-1;
+        undo_piece.value=0;
         apply_move(pieces,grid,&tmp, &undo_piece);
         possible_values[i] = minimax(file, -white, pieces, grid, alpha, beta, depth - 1);
         undo_move(pieces,grid,&tmp, &undo_piece);
