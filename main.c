@@ -29,7 +29,7 @@ void update_grid(Piece *pieces, int grid[]){
     }
 }
 
-void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
+void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo_piece){
     //Don't work with x=0 and y=0 move
     int target=grid[(pieces[move->piece].x+(move->x))+(pieces[move->piece].y+(move->y))*8];
     if (target!=32){
@@ -39,9 +39,7 @@ void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
         undo_piece->y = target;
         pieces[target].value=0;
     }
-    grid[pieces[move->piece].x+pieces[move->piece].y*8]=32;
-    pieces[move->piece].x += move->x;
-    pieces[move->piece].y += move->y;
+    // special rules
     if (move->transform){
         pieces[move->piece].txt = move->transform;
         if(move->transform == 'Q'){
@@ -54,6 +52,12 @@ void apply_move(Piece *pieces, int grid[], Move *move, Piece *undo_piece){
             pieces[move->piece].value = 3;
         }
     }
+
+
+    //update grid
+    grid[pieces[move->piece].x+pieces[move->piece].y*8]=32;
+    pieces[move->piece].x += move->x;
+    pieces[move->piece].y += move->y;
     grid[pieces[move->piece].x+pieces[move->piece].y*8]=move->piece;
 }
 
@@ -380,10 +384,10 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
     return 1;
 }
 
-int move_defend_king(Piece pieces[], int grid[], Move *move, short *white){
+int move_defend_king(Piece pieces[], int grid[], Board *board, Move *move, short *white){
     Piece undo_piece = {};
     Move tmp = {};
-    apply_move(pieces,grid,move, &undo_piece);
+    apply_move(pieces,grid,board,move, &undo_piece);
     int not_attacked = not_defended(23-8*(*white), pieces, grid, &tmp, white);
     undo_move(pieces,grid,move, &undo_piece);
     return not_attacked;
@@ -403,7 +407,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
             // move forward
             tmp.x=0;
             tmp.y=1*white;
-            if (piece_there(&pieces[i], grid, &tmp)==32 && move_defend_king(pieces, grid, &tmp, &white))
+            if (piece_there(&pieces[i], grid, &tmp)==32 && move_defend_king(pieces, grid, board, &tmp, &white))
             {
                 // transform into another piece
                 if ((white == 1 && pieces[i].y == 6) || (white == -1 && pieces[i].y == 1)){
@@ -433,7 +437,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
             {
                 if ((white==1 && pieces[i].y==1) || (white==-1 && pieces[i].y==6)){
                     tmp.y=2*white;
-                    if (piece_there(&pieces[i], grid, &tmp)==32 && move_defend_king(pieces, grid, &tmp, &white))
+                    if (piece_there(&pieces[i], grid, &tmp)==32 && move_defend_king(pieces, grid, board, &tmp, &white))
                     {
                         possible[*fill]=tmp;
                         *fill += 1;
@@ -443,7 +447,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
             // eat on the left (for white, and right for black)
             tmp.x=-1;
             tmp.y=1*white;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white))
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, board, &tmp, &white))
             {
                 // transform into another piece
                 if ((white == 1 && pieces[i].y == 6) || (white == -1 && pieces[i].y == 1)){
@@ -467,7 +471,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
             // eat on the right (for white, and left for black)
             tmp.x=1;
             tmp.y=1*white;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white))
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_piece_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, board, &tmp, &white))
             {
                 // transform into another piece
                 if ((white == 1 && pieces[i].y == 6) || (white == -1 && pieces[i].y == 1)){
@@ -492,49 +496,49 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
         else if (pieces[i].txt == 'N'){
             tmp.x=1;
             tmp.y=2;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, board, &tmp, &white)){
                 possible[*fill]=tmp;
                 *fill += 1;
             }
             tmp.x=-1;
             tmp.y=2;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, board, &tmp, &white)){
                 possible[*fill]=tmp;
                 *fill += 1;
             }
             tmp.x=1;
             tmp.y=-2;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, board, &tmp, &white)){
                 possible[*fill]=tmp;
                 *fill += 1;
             }
             tmp.x=-1;
             tmp.y=-2;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, board, &tmp, &white)){
                 possible[*fill]=tmp;
                 *fill += 1;
             }
             tmp.x=2;
             tmp.y=1;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, board, &tmp, &white)){
                 possible[*fill]=tmp;
                 *fill += 1;
             }
             tmp.x=2;
             tmp.y=-1;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, board, &tmp, &white)){
                 possible[*fill]=tmp;
                 *fill += 1;
             }
             tmp.x=-2;
             tmp.y=1;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, board, &tmp, &white)){
                 possible[*fill]=tmp;
                 *fill += 1;
             }
             tmp.x=-2;
             tmp.y=-1;
-            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, &tmp, &white)){
+            if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && move_defend_king(pieces, grid, board, &tmp, &white)){
                 possible[*fill]=tmp;
                 *fill += 1;
             }
@@ -547,7 +551,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -562,7 +566,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -577,7 +581,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -592,7 +596,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -609,7 +613,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -624,7 +628,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -639,7 +643,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -654,7 +658,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -672,7 +676,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -687,7 +691,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -702,7 +706,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -717,7 +721,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -733,7 +737,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -748,7 +752,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -763,7 +767,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -778,7 +782,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     break;
                 }
                 test_piece = piece_there(&pieces[i], grid, &tmp);
-                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, &tmp, &white)){
+                if (((8 + white*8 <= test_piece && test_piece < 24 + white*8) || test_piece==32) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -864,7 +868,7 @@ float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha,
     {
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
-            apply_move(pieces,grid,&possible[i], &undo_piece);
+            apply_move(pieces,grid,board,&possible[i], &undo_piece);
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
             undo_move(pieces,grid,&possible[i], &undo_piece);
             if (alpha < possible_best){
@@ -880,7 +884,7 @@ float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha,
     {
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
-            apply_move(pieces,grid,&possible[i], &undo_piece);
+            apply_move(pieces,grid,board,&possible[i], &undo_piece);
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
             undo_move(pieces,grid,&possible[i], &undo_piece);
             if (possible_best < beta){
@@ -923,7 +927,7 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
     for (int i=0; i < fill; i++){
         tmp = possible[i];
         undo_piece.value=0;
-        apply_move(pieces,grid,&tmp, &undo_piece);
+        apply_move(pieces,grid,board,&tmp, &undo_piece);
         possible_values[i] = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
         undo_move(pieces,grid,&tmp, &undo_piece);
         // if (white==1)
@@ -1080,7 +1084,7 @@ int main (int argc, char *argv[]){
         }
         lettre = 'a' + pieces[move.piece].x+move.x;
         printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
-        apply_move(pieces,grid,&move, &undo_piece);
+        apply_move(pieces,grid,&board,&move, &undo_piece);
         plot_grid(pieces,grid);
         printf("\n");
         white=-white;
