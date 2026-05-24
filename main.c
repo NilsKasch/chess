@@ -389,7 +389,7 @@ int move_defend_king(Piece pieces[], int grid[], Move *move, short *white){
     return not_attacked;
 }
 
-void possible_moves(short white, Piece *pieces, int grid[], Move possible[], int *fill){
+void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move possible[], int *fill){
     Move tmp = {};
     int test_piece;
 
@@ -840,7 +840,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Move possible[], int
     }
 }
 
-float minimax(short white, Piece *pieces, int grid[], float alpha, float beta, int depth){
+float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha, float beta, int depth){
     Move possible[138] = {};
     float possible_best;
     Piece undo_piece = {};
@@ -850,7 +850,7 @@ float minimax(short white, Piece *pieces, int grid[], float alpha, float beta, i
         return eval(pieces);
     }
 
-    possible_moves(white, pieces, grid, possible, &fill);
+    possible_moves(white, pieces, grid, board, possible, &fill);
 
     if (fill==0){
         if (not_defended(23-8*white, pieces, grid, &possible[0], &white)){
@@ -865,7 +865,7 @@ float minimax(short white, Piece *pieces, int grid[], float alpha, float beta, i
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             apply_move(pieces,grid,&possible[i], &undo_piece);
-            possible_best = minimax(-white, pieces, grid, alpha, beta, depth - 1);
+            possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
             undo_move(pieces,grid,&possible[i], &undo_piece);
             if (alpha < possible_best){
                 alpha = possible_best;
@@ -881,7 +881,7 @@ float minimax(short white, Piece *pieces, int grid[], float alpha, float beta, i
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             apply_move(pieces,grid,&possible[i], &undo_piece);
-            possible_best = minimax(-white, pieces, grid, alpha, beta, depth - 1);
+            possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
             undo_move(pieces,grid,&possible[i], &undo_piece);
             if (possible_best < beta){
                 beta = possible_best;
@@ -895,7 +895,7 @@ float minimax(short white, Piece *pieces, int grid[], float alpha, float beta, i
 }
 
 
-Move rnd_best_move(short white, Piece *pieces, int grid[],  int depth){
+Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int depth){
     /// TODO:
     // Mettre une limite max au nombre de coups équivalents random gardées 
     // (= au bout d'un certain nombre de coups, mettre aplha <= beta)
@@ -918,13 +918,13 @@ Move rnd_best_move(short white, Piece *pieces, int grid[],  int depth){
         return best;
     }
 
-    possible_moves(white, pieces, grid, possible, &fill);
+    possible_moves(white, pieces, grid, board, possible, &fill);
 
     for (int i=0; i < fill; i++){
         tmp = possible[i];
         undo_piece.value=0;
         apply_move(pieces,grid,&tmp, &undo_piece);
-        possible_values[i] = minimax(-white, pieces, grid, alpha, beta, depth - 1);
+        possible_values[i] = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
         undo_move(pieces,grid,&tmp, &undo_piece);
         // if (white==1)
         // {
@@ -1037,6 +1037,8 @@ int main (int argc, char *argv[]){
         {'K',1000,4,7}
     };
 
+    Board board = {0,1,1};
+
     int grid[64]={};
     for (int i = 0; i < 64; i++) {
         grid[i]=32;
@@ -1060,7 +1062,7 @@ int main (int argc, char *argv[]){
     //srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
-        move = rnd_best_move(white,pieces,grid,d);
+        move = rnd_best_move(white,pieces,grid,&board,d);
         if (move.x == 0 && move.y == 0){
             if (!not_defended(23-8*white, pieces, grid, &move, &white))
             {
