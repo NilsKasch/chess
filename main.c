@@ -886,9 +886,6 @@ float minimax(FILE *file, short white, Piece *pieces, int grid[], float alpha, f
             //stalemate
             best=0;
         }
-        if (depth=1){
-            export_data(file,pieces,grid,depth,best);
-        }
         return best;
     }
     best = possible_values[0];
@@ -896,9 +893,6 @@ float minimax(FILE *file, short white, Piece *pieces, int grid[], float alpha, f
         if (possible_values[i]*white > best*white){
             best = possible_values[i];
         }
-    }
-    if (depth==1){
-        export_data(file,pieces,grid,depth,best);
     }
     return best;
 }
@@ -935,22 +929,22 @@ Move rnd_best_move(FILE *file, short white, Piece *pieces, int grid[],  int dept
         apply_move(pieces,grid,&tmp, &undo_piece);
         possible_values[i] = minimax(file, -white, pieces, grid, alpha, beta, depth - 1);
         undo_move(pieces,grid,&tmp, &undo_piece);
-        if (white==1)
-        {
-            if (alpha < possible_values[i]){
-                alpha = possible_values[i];
-            }
-        }
-        else
-        {
-            if (possible_values[i] < beta){
-                beta = possible_values[i];
-            }
-        }
-        if (beta <= alpha){
-            fill = i+1;
-            break;
-        }
+        // if (white==1)
+        // {
+        //     if (alpha < possible_values[i]){
+        //         alpha = possible_values[i];
+        //     }
+        // }
+        // else
+        // {
+        //     if (possible_values[i] < beta){
+        //         beta = possible_values[i];
+        //     }
+        // }
+        // if (beta < alpha){
+        //     fill = i+1;
+        //     break;
+        // }
     }
 
     // select
@@ -1065,8 +1059,8 @@ int main (int argc, char *argv[]){
     Piece undo_piece = {};
     char lettre;
     short white = 1;
-    srand(19); //10 14 15
-    //srand(time(NULL));  // Seed
+    //srand(19); //10 14 15
+    srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
         //file open
