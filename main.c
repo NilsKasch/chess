@@ -842,7 +842,6 @@ void possible_moves(short white, Piece *pieces, int grid[], Move possible[], int
 
 float minimax(FILE *file, short white, Piece *pieces, int grid[], float alpha, float beta, int depth){
     float best = -1000*white;
-    Move tmp = {};
     Move possible[138] = {};
     float possible_best;
     Piece undo_piece = {};
@@ -854,22 +853,19 @@ float minimax(FILE *file, short white, Piece *pieces, int grid[], float alpha, f
 
     possible_moves(white, pieces, grid, possible, &fill);
 
-    tmp.x=0;
-    tmp.y=0;
     if (fill==0){
-        if (not_defended(23-8*white, pieces, grid, &tmp, &white)){
-            //stalemate
+        if (not_defended(23-8*white, pieces, grid, &possible[0], &white)){
+            //stalemate (possible[0] = no move)
             best=0;
         }
         return best;
     }
 
     for (int i=0; i < fill; i++){
-        tmp = possible[i];
         undo_piece.value=0;
-        apply_move(pieces,grid,&tmp, &undo_piece);
+        apply_move(pieces,grid,&possible[i], &undo_piece);
         possible_best = minimax(file, -white, pieces, grid, alpha, beta, depth - 1);
-        undo_move(pieces,grid,&tmp, &undo_piece);
+        undo_move(pieces,grid,&possible[i], &undo_piece);
         if (white==1)
         {
             if (alpha < possible_best){
@@ -892,7 +888,6 @@ float minimax(FILE *file, short white, Piece *pieces, int grid[], float alpha, f
     else{
         return beta;
     }
-    
 }
 
 
