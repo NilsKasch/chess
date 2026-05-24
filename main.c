@@ -52,7 +52,27 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
             pieces[move->piece].value = 3;
         }
     }
-
+    else if (board->white_castle_left || board->white_castle_right || board->black_castle_left || board->black_castle_right) //if supplémentaire a tester si plus rapide sans
+    {
+        if (pieces[move->piece].txt == 'R' || pieces[move->piece].txt == 'K'){
+            if (pieces[move->piece].y <= 3){
+                if (pieces[move->piece].x <= 4){
+                    board->white_castle_left=0;
+                }
+                if (pieces[move->piece].x >= 4){
+                    board->white_castle_right=0;
+                }
+            }
+            else{
+                if (pieces[move->piece].x <= 4){
+                    board->black_castle_left=0;
+                }
+                if (pieces[move->piece].x >= 4){
+                    board->black_castle_right=0;
+                }
+            }
+        }
+    }
 
     //update grid
     grid[pieces[move->piece].x+pieces[move->piece].y*8]=32;
