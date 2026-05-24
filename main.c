@@ -840,7 +840,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Move possible[], int
     }
 }
 
-float minimax(FILE *file, short white, Piece *pieces, int grid[], float alpha, float beta, int depth){
+float minimax(short white, Piece *pieces, int grid[], float alpha, float beta, int depth){
     float best = -1000*white;
     Move possible[138] = {};
     float possible_best;
@@ -864,7 +864,7 @@ float minimax(FILE *file, short white, Piece *pieces, int grid[], float alpha, f
     for (int i=0; i < fill; i++){
         undo_piece.value=0;
         apply_move(pieces,grid,&possible[i], &undo_piece);
-        possible_best = minimax(file, -white, pieces, grid, alpha, beta, depth - 1);
+        possible_best = minimax(-white, pieces, grid, alpha, beta, depth - 1);
         undo_move(pieces,grid,&possible[i], &undo_piece);
         if (white==1)
         {
@@ -891,7 +891,7 @@ float minimax(FILE *file, short white, Piece *pieces, int grid[], float alpha, f
 }
 
 
-Move rnd_best_move(FILE *file, short white, Piece *pieces, int grid[],  int depth){
+Move rnd_best_move(short white, Piece *pieces, int grid[],  int depth){
     /// TODO:
     // Mettre une limite max au nombre de coups équivalents random gardées 
     // (= au bout d'un certain nombre de coups, mettre aplha <= beta)
@@ -920,7 +920,7 @@ Move rnd_best_move(FILE *file, short white, Piece *pieces, int grid[],  int dept
         tmp = possible[i];
         undo_piece.value=0;
         apply_move(pieces,grid,&tmp, &undo_piece);
-        possible_values[i] = minimax(file, -white, pieces, grid, alpha, beta, depth - 1);
+        possible_values[i] = minimax(-white, pieces, grid, alpha, beta, depth - 1);
         undo_move(pieces,grid,&tmp, &undo_piece);
         // if (white==1)
         // {
@@ -1056,17 +1056,7 @@ int main (int argc, char *argv[]){
     //srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
-        //file open
-        snprintf(filename, sizeof(filename),"data/data_%d.chess", i);
-        FILE *file = fopen(filename, "w");
-        if (file == NULL) {
-            printf("Erreur ouverture fichier\n");
-            exit(1);
-        }
-        fprintf(file, "white: %d\n",white);
-        export_data(file,pieces,grid,-1,-1);
-
-        move = rnd_best_move(file,white,pieces,grid,d);
+        move = rnd_best_move(white,pieces,grid,d);
         if (move.x == 0 && move.y == 0){
             if (!not_defended(23-8*white, pieces, grid, &move, &white))
             {
@@ -1088,7 +1078,6 @@ int main (int argc, char *argv[]){
         plot_grid(pieces,grid);
         printf("\n");
         white=-white;
-        fclose(file);
     }
     return 0;
 }

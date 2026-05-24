@@ -106,3 +106,16 @@ void export_data(FILE *fichier, Piece *pieces, int grid[], int depth, float eval
     write_grid(fichier, pieces, grid);
 
 }
+
+
+
+        // //file open
+        // snprintf(filename, sizeof(filename),"data/data_%d.chess", i);
+        // FILE *file = fopen(filename, "w");
+        // if (file == NULL) {
+        //     printf("Erreur ouverture fichier\n");
+        //     exit(1);
+        // }
+        // fprintf(file, "white: %d\n",white);
+        // export_data(file,pieces,grid,-1,-1);
+        // fclose(file);
