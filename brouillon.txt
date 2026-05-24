@@ -2,7 +2,6 @@ Improvements:
 - prise en passant
 - rock
 - max 3 répétitions, et max 50 coups sans mouvement de pions ni prises
-- minimax algo
 
 
 

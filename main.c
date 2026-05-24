@@ -841,7 +841,6 @@ void possible_moves(short white, Piece *pieces, int grid[], Move possible[], int
 }
 
 float minimax(short white, Piece *pieces, int grid[], float alpha, float beta, int depth){
-    float best = -1000*white;
     Move possible[138] = {};
     float possible_best;
     Piece undo_piece = {};
@@ -856,36 +855,41 @@ float minimax(short white, Piece *pieces, int grid[], float alpha, float beta, i
     if (fill==0){
         if (not_defended(23-8*white, pieces, grid, &possible[0], &white)){
             //stalemate (possible[0] = no move)
-            best=0;
+            return 0;
         }
-        return best;
+        return -1000*white;;
     }
 
-    for (int i=0; i < fill; i++){
-        undo_piece.value=0;
-        apply_move(pieces,grid,&possible[i], &undo_piece);
-        possible_best = minimax(-white, pieces, grid, alpha, beta, depth - 1);
-        undo_move(pieces,grid,&possible[i], &undo_piece);
-        if (white==1)
-        {
+    if (white==1)
+    {
+        for (int i=0; i < fill; i++){
+            undo_piece.value=0;
+            apply_move(pieces,grid,&possible[i], &undo_piece);
+            possible_best = minimax(-white, pieces, grid, alpha, beta, depth - 1);
+            undo_move(pieces,grid,&possible[i], &undo_piece);
             if (alpha < possible_best){
                 alpha = possible_best;
             }
+            if (beta <= alpha){
+                break;
+            }
         }
-        else
-        {
+        return alpha;
+    }
+    else
+    {
+        for (int i=0; i < fill; i++){
+            undo_piece.value=0;
+            apply_move(pieces,grid,&possible[i], &undo_piece);
+            possible_best = minimax(-white, pieces, grid, alpha, beta, depth - 1);
+            undo_move(pieces,grid,&possible[i], &undo_piece);
             if (possible_best < beta){
                 beta = possible_best;
             }
+            if (beta <= alpha){
+                break;
+            }
         }
-        if (beta <= alpha){
-            break;
-        }
-    }
-    if (white==1){
-        return alpha;
-    }
-    else{
         return beta;
     }
 }
