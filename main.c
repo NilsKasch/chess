@@ -86,22 +86,30 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
         if (pieces[move->piece].txt == 'R' || pieces[move->piece].txt == 'K'){
             if (pieces[move->piece].y <= 3){
                 if (pieces[move->piece].x <= 4){
-                    board->white_castle_left=0;
-                    undo_piece->y = 1; // used to stock if undo_move should restore castle rights
+                    if (board->white_castle_left){
+                        board->white_castle_left=0;
+                        undo_piece->y = 1; // used to stock if undo_move should restore castle rights
+                    }
                 }
                 if (pieces[move->piece].x >= 4){
-                    board->white_castle_right=0;
-                    undo_piece->y = 1; // used to stock if undo_move should restore castle rights
+                    if (board->white_castle_right){
+                        board->white_castle_right=0;
+                        undo_piece->y = 1; // used to stock if undo_move should restore castle rights
+                    }
                 }
             }
             else{
                 if (pieces[move->piece].x <= 4){
-                    board->black_castle_left=0;
-                    undo_piece->y = 1; // used to stock if undo_move should restore castle rights
+                    if (board->black_castle_left){
+                        board->black_castle_left=0;
+                        undo_piece->y = 1; // used to stock if undo_move should restore castle rights 
+                    }
                 }
                 if (pieces[move->piece].x >= 4){
-                    board->black_castle_right=0;
-                    undo_piece->y = 1; // used to stock if undo_move should restore castle rights
+                    if (board->black_castle_right){
+                        board->black_castle_right=0;
+                        undo_piece->y = 1; // used to stock if undo_move should restore castle rights
+                    }
                 }
             }
         }
@@ -148,6 +156,7 @@ void undo_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo_
         else{
             if (pieces[move->piece].x <= 4){
                 board->black_castle_left=1;
+                //printf("wtf move: %c %d %d \n", pieces[move->piece].txt, move->x, move->y);
             }
             if (pieces[move->piece].x >= 4){
                 board->black_castle_right=1;
@@ -1710,6 +1719,7 @@ int main (int argc, char *argv[]){
         printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
         apply_move(pieces,grid,&board,&move, &undo_piece);
         plot_grid(pieces,grid);
+        printf("board %d %d %d %d %d", board.en_passant, board.white_castle_left, board.white_castle_right, board.black_castle_left, board.black_castle_right);
         printf("\n");
         white=-white;
     }
