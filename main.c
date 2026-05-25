@@ -430,6 +430,471 @@ int not_defended(int piece, Piece pieces[], int grid[], Move *move, short *white
     return 1;
 }
 
+int possible_to_castle_white_left(Piece pieces[], int grid[]){
+    // call this only if there is free space for castling
+    // grid[1]==32 && grid[2]==32 && grid[3]==32
+    int test_piece;
+    Move tmp={};
+    for (int piece_x=1; piece_x<4; piece_x++){
+        for (int x=1; x<8; x++){
+            //BISHOP
+            tmp.x=x;
+            tmp.y=x;
+            // if not on the board
+            if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+                break;
+            }
+            test_piece = grid[piece_x+tmp.x+tmp.y*8];
+            if ( 16 <= test_piece && test_piece < 32 ){
+                if (x==1){
+                    if (pieces[test_piece].txt == 'K' || pieces[test_piece].txt == 'p'){
+                        return 0;
+                    }
+                }
+                if (pieces[test_piece].txt == 'B' || pieces[test_piece].txt == 'Q'){
+                    return 0;
+                }
+            }
+            if(test_piece!=32){
+                break;
+            }
+        }
+        for (int x=1; x<8; x++){
+            //BISHOP
+            tmp.x=-x;
+            tmp.y=x;
+            // if not on the board
+            if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+                break;
+            }
+            test_piece = grid[piece_x+tmp.x+tmp.y*8];
+            if ( 16 <= test_piece && test_piece < 32 ){
+                if (x==1){
+                    if (pieces[test_piece].txt == 'K' || pieces[test_piece].txt == 'p'){
+                        return 0;
+                    }
+                }
+                if (pieces[test_piece].txt == 'B' || pieces[test_piece].txt == 'Q'){
+                    return 0;
+                }
+            }
+            if(test_piece!=32){
+                break;
+            }
+        }
+        for (int x=1; x<8; x++){
+            //ROOK
+            tmp.x=0;
+            tmp.y=x;
+            // if not on the board
+            if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+                break;
+            }
+            test_piece = grid[piece_x+tmp.x+tmp.y*8];
+            if ( 16 <= test_piece && test_piece < 32 ){
+                if (x==1){
+                    if (pieces[test_piece].txt == 'K'){
+                        return 0;
+                    }
+                }
+                if (pieces[test_piece].txt == 'R' || pieces[test_piece].txt == 'Q'){
+                    return 0;
+                }
+            }
+            if(test_piece!=32){
+                break;
+            }
+        }
+        //Knight
+        tmp.x= 2;
+        tmp.y= 1;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+            test_piece = grid[piece_x+tmp.x+tmp.y*8];
+            if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+        tmp.x= 1;
+        tmp.y= 2;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+            test_piece = grid[piece_x+tmp.x+tmp.y*8];
+            if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+        tmp.x= -1;
+        tmp.y= 2;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+            test_piece = grid[piece_x+tmp.x+tmp.y*8];
+            if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+        tmp.x= -2;
+        tmp.y= 1;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+            test_piece = grid[piece_x+tmp.x+tmp.y*8];
+            if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+int possible_to_castle_white_right(Piece pieces[], int grid[]){
+    // call this only if there is free space for castling
+    // grid[5]==32 && grid[6]==32
+    int test_piece;
+    Move tmp={};
+    for (int piece_x=5; piece_x<7; piece_x++){
+        for (int x=1; x<8; x++){
+            //BISHOP
+            tmp.x=x;
+            tmp.y=x;
+            // if not on the board
+            if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+                break;
+            }
+            test_piece = grid[piece_x+tmp.x+tmp.y*8];
+            if ( 16 <= test_piece && test_piece < 32 ){
+                if (x==1){
+                    if (pieces[test_piece].txt == 'K' || pieces[test_piece].txt == 'p'){
+                        return 0;
+                    }
+                }
+                if (pieces[test_piece].txt == 'B' || pieces[test_piece].txt == 'Q'){
+                    return 0;
+                }
+            }
+            if(test_piece!=32){
+                break;
+            }
+        }
+        for (int x=1; x<8; x++){
+            //BISHOP
+            tmp.x=-x;
+            tmp.y=x;
+            // if not on the board
+            if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+                break;
+            }
+            test_piece = grid[piece_x+tmp.x+tmp.y*8];
+            if ( 16 <= test_piece && test_piece < 32 ){
+                if (x==1){
+                    if (pieces[test_piece].txt == 'K' || pieces[test_piece].txt == 'p'){
+                        return 0;
+                    }
+                }
+                if (pieces[test_piece].txt == 'B' || pieces[test_piece].txt == 'Q'){
+                    return 0;
+                }
+            }
+            if(test_piece!=32){
+                break;
+            }
+        }
+        for (int x=1; x<8; x++){
+            //ROOK
+            tmp.x=0;
+            tmp.y=x;
+            // if not on the board
+            if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+                break;
+            }
+            test_piece = grid[piece_x+tmp.x+tmp.y*8];
+            if ( 16 <= test_piece && test_piece < 32 ){
+                if (x==1){
+                    if (pieces[test_piece].txt == 'K'){
+                        return 0;
+                    }
+                }
+                if (pieces[test_piece].txt == 'R' || pieces[test_piece].txt == 'Q'){
+                    return 0;
+                }
+            }
+            if(test_piece!=32){
+                break;
+            }
+        }
+        //Knight
+        tmp.x= 2;
+        tmp.y= 1;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+            test_piece = grid[piece_x+tmp.x+tmp.y*8];
+            if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+        tmp.x= 1;
+        tmp.y= 2;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+            test_piece = grid[piece_x+tmp.x+tmp.y*8];
+            if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+        tmp.x= -1;
+        tmp.y= 2;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+            test_piece = grid[piece_x+tmp.x+tmp.y*8];
+            if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+        tmp.x= -2;
+        tmp.y= 1;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+            test_piece = grid[piece_x+tmp.x+tmp.y*8];
+            if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+int possible_to_castle_black_left(Piece pieces[], int grid[]){
+    // call this only if there is free space for castling
+    // grid[25]==32 && grid[26]==32 && grid[27]==32
+    int test_piece;
+    Move tmp={};
+    for (int piece_x=1; piece_x<4; piece_x++){
+        for (int x=1; x<8; x++){
+            //BISHOP
+            tmp.x=x;
+            tmp.y=x;
+            // if not on the board
+            if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+                break;
+            }
+            test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
+            if ( 0 <= test_piece && test_piece < 16 ){
+                if (x==1){
+                    if (pieces[test_piece].txt == 'K' || pieces[test_piece].txt == 'p'){
+                        return 0;
+                    }
+                }
+                if (pieces[test_piece].txt == 'B' || pieces[test_piece].txt == 'Q'){
+                    return 0;
+                }
+            }
+            if(test_piece!=32){
+                break;
+            }
+        }
+        for (int x=1; x<8; x++){
+            //BISHOP
+            tmp.x=-x;
+            tmp.y=x;
+            // if not on the board
+            if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+                break;
+            }
+            test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
+            if ( 0 <= test_piece && test_piece < 16 ){
+                if (x==1){
+                    if (pieces[test_piece].txt == 'K' || pieces[test_piece].txt == 'p'){
+                        return 0;
+                    }
+                }
+                if (pieces[test_piece].txt == 'B' || pieces[test_piece].txt == 'Q'){
+                    return 0;
+                }
+            }
+            if(test_piece!=32){
+                break;
+            }
+        }
+        for (int x=1; x<8; x++){
+            //ROOK
+            tmp.x=0;
+            tmp.y=x;
+            // if not on the board
+            if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+                break;
+            }
+            test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
+            if ( 0 <= test_piece && test_piece < 16 ){
+                if (x==1){
+                    if (pieces[test_piece].txt == 'K'){
+                        return 0;
+                    }
+                }
+                if (pieces[test_piece].txt == 'R' || pieces[test_piece].txt == 'Q'){
+                    return 0;
+                }
+            }
+            if(test_piece!=32){
+                break;
+            }
+        }
+        //Knight
+        tmp.x= 2;
+        tmp.y= 1;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+            test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
+            if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+        tmp.x= 1;
+        tmp.y= 2;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+            test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
+            if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+        tmp.x= -1;
+        tmp.y= 2;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+            test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
+            if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+        tmp.x= -2;
+        tmp.y= 1;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+            test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
+            if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+int possible_to_castle_black_right(Piece pieces[], int grid[]){
+    // call this only if there is free space for castling
+    // grid[29]==32 && grid[30]==32
+    int test_piece;
+    Move tmp={};
+    for (int piece_x=5; piece_x<7; piece_x++){
+        for (int x=1; x<8; x++){
+            //BISHOP
+            tmp.x=x;
+            tmp.y=x;
+            // if not on the board
+            if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+                break;
+            }
+            test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
+            if ( 0 <= test_piece && test_piece < 16 ){
+                if (x==1){
+                    if (pieces[test_piece].txt == 'K' || pieces[test_piece].txt == 'p'){
+                        return 0;
+                    }
+                }
+                if (pieces[test_piece].txt == 'B' || pieces[test_piece].txt == 'Q'){
+                    return 0;
+                }
+            }
+            if(test_piece!=32){
+                break;
+            }
+        }
+        for (int x=1; x<8; x++){
+            //BISHOP
+            tmp.x=-x;
+            tmp.y=x;
+            // if not on the board
+            if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+                break;
+            }
+            test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
+            if ( 0 <= test_piece && test_piece < 16 ){
+                if (x==1){
+                    if (pieces[test_piece].txt == 'K' || pieces[test_piece].txt == 'p'){
+                        return 0;
+                    }
+                }
+                if (pieces[test_piece].txt == 'B' || pieces[test_piece].txt == 'Q'){
+                    return 0;
+                }
+            }
+            if(test_piece!=32){
+                break;
+            }
+        }
+        for (int x=1; x<8; x++){
+            //ROOK
+            tmp.x=0;
+            tmp.y=x;
+            // if not on the board
+            if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+                break;
+            }
+            test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
+            if ( 0 <= test_piece && test_piece < 16 ){
+                if (x==1){
+                    if (pieces[test_piece].txt == 'K'){
+                        return 0;
+                    }
+                }
+                if (pieces[test_piece].txt == 'R' || pieces[test_piece].txt == 'Q'){
+                    return 0;
+                }
+            }
+            if(test_piece!=32){
+                break;
+            }
+        }
+        //Knight
+        tmp.x= 2;
+        tmp.y= 1;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+            test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
+            if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+        tmp.x= 1;
+        tmp.y= 2;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+            test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
+            if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+        tmp.x= -1;
+        tmp.y= 2;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+            test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
+            if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+        tmp.x= -2;
+        tmp.y= 1;
+        // if not on the board
+        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+            test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
+            if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+
 int move_defend_king(Piece pieces[], int grid[], Board *board, Move *move, short *white){
     Piece undo_piece = {};
     Move tmp = {};
@@ -885,6 +1350,56 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
             if (is_on_the_board(&pieces[i],&tmp) && opponent_or_free_there(&pieces[i], grid, &tmp, &white) && not_defended(i, pieces, grid, &tmp, &white)){
                 possible[*fill]=tmp;
                 *fill += 1;
+            }
+            tmp.y=0;
+            tmp.x=0;
+            if (not_defended(i, pieces, grid, &tmp, &white)){
+                if (white == 1){
+                    if (board->white_castle_left){
+                        if (grid[1]==32 && grid[2]==32 && grid[3]==32){
+                            if (possible_to_castle_white_left(pieces,grid)){
+                                tmp.x=-2;
+                                possible[*fill]=tmp;
+                                *fill += 1;
+                                tmp.x=0;
+                            }
+                        }
+                    }
+                    if (board->white_castle_right)
+                    {
+                        if (grid[5]==32 && grid[6]==32){
+                            if (possible_to_castle_white_right(pieces,grid)){
+                                tmp.x=2;
+                                possible[*fill]=tmp;
+                                *fill += 1;
+                                tmp.x=0;
+                            }
+                        }
+                    }
+                }
+                else{
+                    if (board->black_castle_left){
+                        if (grid[25]==32 && grid[26]==32 && grid[27]==32){
+                            if (possible_to_castle_black_left(pieces,grid)){
+                                tmp.x=-2;
+                                possible[*fill]=tmp;
+                                *fill += 1;
+                                tmp.x=0;
+                            }
+                        }
+                    }
+                    if (board->black_castle_right)
+                    {
+                        if (grid[29]==32 && grid[30]==32){
+                            if (possible_to_castle_black_right(pieces,grid)){
+                                tmp.x=2;
+                                possible[*fill]=tmp;
+                                *fill += 1;
+                                tmp.x=0;
+                            }
+                        }
+                    }
+                }
             }
         }
     }
