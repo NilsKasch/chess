@@ -53,6 +53,36 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
     }
     else if (board->white_castle_left || board->white_castle_right || board->black_castle_left || board->black_castle_right) //if supplémentaire a tester si plus rapide sans
     {
+        if (pieces[move->piece].txt == 'K'){
+            if (move->x == -2){
+                if (pieces[move->piece].y <= 3){
+                    //move the rook
+                    grid[0]=32;
+                    pieces[8].x = 3;
+                    grid[3]=8;
+                }
+                else{
+                    //move the rook
+                    grid[56]=32;
+                    pieces[24].x = 59;
+                    grid[59]=24;
+                }
+            }
+            if (move->x == 2){
+                if (pieces[move->piece].y <= 3){
+                    //move the rook
+                    grid[7]=32;
+                    pieces[9].x = 5;
+                    grid[5]=9;
+                }
+                else{
+                    //move the rook
+                    grid[63]=32;
+                    pieces[25].x = 61;
+                    grid[61]=25;
+                }
+            }
+        }
         if (pieces[move->piece].txt == 'R' || pieces[move->piece].txt == 'K'){
             if (pieces[move->piece].y <= 3){
                 if (pieces[move->piece].x <= 4){
@@ -121,6 +151,36 @@ void undo_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo_
             }
             if (pieces[move->piece].x >= 4){
                 board->black_castle_right=1;
+            }
+        }
+    }
+    if (pieces[move->piece].txt == 'K'){
+        if (move->x == -2){
+            if (pieces[move->piece].y <= 3){
+                //move the rook
+                grid[0]=8;
+                pieces[8].x = 0;
+                grid[3]=32;
+            }
+            else{
+                //move the rook
+                grid[56]=24;
+                pieces[24].x = 56;
+                grid[59]=32;
+            }
+        }
+        if (move->x == 2){
+            if (pieces[move->piece].y <= 3){
+                //move the rook
+                grid[7]=9;
+                pieces[9].x = 7;
+                grid[5]=32;
+            }
+            else{
+                //move the rook
+                grid[63]=25;
+                pieces[25].x = 63;
+                grid[61]=32;
             }
         }
     }
