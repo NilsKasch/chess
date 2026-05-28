@@ -5,5 +5,6 @@ char *get_symbole(Piece *piece, int i);
 void plot_grid_old(Piece *pieces, int grid[]);
 void plot_grid(Piece *pieces, int grid[]);
 void export_data(FILE *fichier, Piece *pieces, int grid[], int depth, float eval);
+void print_bits(unsigned int);
 
 #endif

@@ -32,6 +32,7 @@ void update_grid(Piece *pieces, int grid[]){
 void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo_piece){
     //Don't work with x=0 and y=0 move
     int target=grid[(pieces[move->piece].x+(move->x))+(pieces[move->piece].y+(move->y))*8];
+    undo_piece->y = board->castle_rights; // used to stock castle rights
     if (target!=32){
         undo_piece->txt = pieces[target].txt;
         undo_piece->value = pieces[target].value;
@@ -40,45 +41,19 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
         //remove castle rights if rook eaten
         if (pieces[target].txt == 'R'){
             if (pieces[target].y <= 3){
-                if (pieces[target].x < 4){
-                    if (board->white_castle_left){
-                        board->white_castle_left=0;
-                        undo_piece->y = 1; // used to stock if undo_move should restore castle rights
-                    }
+                if (pieces[target].x <= 4){
+                    board->castle_rights &= ~WHITE_CASLTE_LEFT;
                 }
-                else if (pieces[target].x > 4){
-                    if (board->white_castle_right){
-                        board->white_castle_right=0;
-                        undo_piece->y = 2; // used to stock if undo_move should restore castle rights
-                    }
-                }
-                else if (pieces[target].x == 4){
-                    if (board->white_castle_right){
-                        board->white_castle_left=0;
-                        board->white_castle_right=0;
-                        undo_piece->y = 3; // used to stock if undo_move should restore castle rights
-                    }
+                if (pieces[target].x >= 4){
+                    board->castle_rights &= ~WHITE_CASLTE_RIGHT;
                 }
             }
             else{
-                if (pieces[target].x < 4){
-                    if (board->black_castle_left){
-                        board->black_castle_left=0;
-                        undo_piece->y = 4; // used to stock if undo_move should restore castle rights 
-                    }
+                if (pieces[target].x <= 4){
+                        board->castle_rights &= ~BLACK_CASLTE_LEFT;
                 }
-                else if (pieces[target].x > 4){
-                    if (board->black_castle_right){
-                        board->black_castle_right=0;
-                        undo_piece->y = 5; // used to stock if undo_move should restore castle rights
-                    }
-                }
-                else if (pieces[target].x == 4){
-                    if (board->black_castle_right){
-                        board->black_castle_left=0;
-                        board->black_castle_right=0;
-                        undo_piece->y = 6; // used to stock if undo_move should restore castle rights
-                    }
+                if (pieces[target].x >= 4){
+                        board->castle_rights &= ~BLACK_CASLTE_RIGHT;
                 }
             }
         }
@@ -96,7 +71,7 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
             pieces[move->piece].value = 3;
         }
     }
-    else if (board->white_castle_left || board->white_castle_right || board->black_castle_left || board->black_castle_right) //if supplémentaire a tester si plus rapide sans
+    else if (board->castle_rights & (WHITE_CASLTE_LEFT | WHITE_CASLTE_RIGHT | BLACK_CASLTE_LEFT | BLACK_CASLTE_RIGHT)) //if supplémentaire a tester si plus rapide sans
     {
         if (pieces[move->piece].txt == 'K'){
             if (move->x == -2){
@@ -129,46 +104,20 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
             }
         }
         if (pieces[move->piece].txt == 'R' || pieces[move->piece].txt == 'K'){
-            if (pieces[target].y <= 3){
-                if (pieces[target].x < 4){
-                    if (board->white_castle_left){
-                        board->white_castle_left=0;
-                        undo_piece->y = 1; // used to stock if undo_move should restore castle rights
-                    }
+            if (pieces[move->piece].y <= 3){
+                if (pieces[move->piece].x <= 4){
+                    board->castle_rights &= ~WHITE_CASLTE_LEFT;
                 }
-                else if (pieces[target].x > 4){
-                    if (board->white_castle_right){
-                        board->white_castle_right=0;
-                        undo_piece->y = 2; // used to stock if undo_move should restore castle rights
-                    }
-                }
-                else if (pieces[target].x == 4){
-                    if (board->white_castle_right){
-                        board->white_castle_left=0;
-                        board->white_castle_right=0;
-                        undo_piece->y = 3; // used to stock if undo_move should restore castle rights
-                    }
+                if (pieces[move->piece].x >= 4){
+                    board->castle_rights &= ~WHITE_CASLTE_RIGHT;
                 }
             }
             else{
-                if (pieces[target].x < 4){
-                    if (board->black_castle_left){
-                        board->black_castle_left=0;
-                        undo_piece->y = 4; // used to stock if undo_move should restore castle rights 
-                    }
+                if (pieces[move->piece].x <= 4){
+                        board->castle_rights &= ~BLACK_CASLTE_LEFT;
                 }
-                else if (pieces[target].x > 4){
-                    if (board->black_castle_right){
-                        board->black_castle_right=0;
-                        undo_piece->y = 5; // used to stock if undo_move should restore castle rights
-                    }
-                }
-                else if (pieces[target].x == 4){
-                    if (board->black_castle_right){
-                        board->black_castle_right=0;
-                        board->black_castle_left=0;
-                        undo_piece->y = 6; // used to stock if undo_move should restore castle rights
-                    }
+                if (pieces[move->piece].x >= 4){
+                        board->castle_rights &= ~BLACK_CASLTE_RIGHT;
                 }
             }
         }
@@ -189,33 +138,13 @@ void undo_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo_
         pieces[undo_piece->x].x = pieces[move->piece].x;
         pieces[undo_piece->x].y = pieces[move->piece].y;
         grid[pieces[move->piece].x+pieces[move->piece].y*8]=undo_piece->x;
-        //update caslting rights if rook was eaten
-        if (undo_piece->txt == 'R' && undo_piece->y){
-            if (undo_piece->y == 1){
-                board->white_castle_left=1;
-            }
-            else if (undo_piece->y == 2){
-                board->white_castle_right=1;
-            }
-            else if (undo_piece->y == 3){
-                board->white_castle_left=1;
-                board->white_castle_right=1;
-            }
-            else if (undo_piece->y == 4){
-                board->black_castle_left=1;
-            }
-            else if (undo_piece->y == 5){
-                board->black_castle_right=1;
-            }
-            else if (undo_piece->y == 6){
-                board->black_castle_left=1;
-                board->black_castle_right=1;
-            }
-        }
     }
     else{
         grid[pieces[move->piece].x+pieces[move->piece].y*8]=32;
     }
+
+    //restore castle rights
+    board->castle_rights = undo_piece->y;
 
     //update grid
     pieces[move->piece].x -= move->x;
@@ -224,29 +153,6 @@ void undo_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo_
     if (move->transform){
         pieces[move->piece].txt = 'p';
         pieces[move->piece].value = 1;
-    }
-    else if (undo_piece->y) // used to stock if undo_move should restore castle rights
-    {
-        if (undo_piece->y == 1){
-            board->white_castle_left=1;
-        }
-        else if (undo_piece->y == 2){
-            board->white_castle_right=1;
-        }
-        else if (undo_piece->y == 3){
-            board->white_castle_left=1;
-            board->white_castle_right=1;
-        }
-        else if (undo_piece->y == 4){
-            board->black_castle_left=1;
-        }
-        else if (undo_piece->y == 5){
-            board->black_castle_right=1;
-        }
-        else if (undo_piece->y == 6){
-            board->black_castle_left=1;
-            board->black_castle_right=1;
-        }
     }
     if (pieces[move->piece].txt == 'K'){
         if (move->x == -2){
@@ -1509,7 +1415,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
             tmp.x=0;
             if (not_defended(i, pieces, grid, &tmp, &white)){
                 if (white == 1){
-                    if (board->white_castle_left){
+                    if (board->castle_rights & WHITE_CASLTE_LEFT){
                         if (grid[1]==32 && grid[2]==32 && grid[3]==32){
                             if (possible_to_castle_white_left(pieces,grid)){
                                 tmp.x=-2;
@@ -1519,7 +1425,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                             }
                         }
                     }
-                    if (board->white_castle_right)
+                    if (board->castle_rights & WHITE_CASLTE_RIGHT)
                     {
                         if (grid[5]==32 && grid[6]==32){
                             if (possible_to_castle_white_right(pieces,grid)){
@@ -1532,7 +1438,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     }
                 }
                 else{
-                    if (board->black_castle_left){
+                    if (board->castle_rights & BLACK_CASLTE_LEFT){
                         if (grid[57]==32 && grid[58]==32 && grid[59]==32){
                             if (possible_to_castle_black_left(pieces,grid)){
                                 tmp.x=-2;
@@ -1542,7 +1448,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                             }
                         }
                     }
-                    if (board->black_castle_right)
+                    if (board->castle_rights & BLACK_CASLTE_RIGHT)
                     {
                         if (grid[61]==32 && grid[62]==32){
                             if (possible_to_castle_black_right(pieces,grid)){
@@ -1759,7 +1665,7 @@ int main (int argc, char *argv[]){
         {'K',1000,4,7}
     };
 
-    Board board = {0,1,1,1,1};
+    Board board = {0,(WHITE_CASLTE_LEFT | WHITE_CASLTE_RIGHT | BLACK_CASLTE_LEFT | BLACK_CASLTE_RIGHT)};
 
     int grid[64]={};
     for (int i = 0; i < 64; i++) {
@@ -1804,7 +1710,8 @@ int main (int argc, char *argv[]){
         printf("%d.%c%c%d\n",i,pieces[move.piece].txt, lettre, pieces[move.piece].y+move.y+1);
         apply_move(pieces,grid,&board,&move, &undo_piece);
         plot_grid(pieces,grid);
-        printf("board %d %d %d %d %d", board.en_passant, board.white_castle_left, board.white_castle_right, board.black_castle_left, board.black_castle_right);
+        printf("board");
+        print_bits(board.castle_rights);
         printf("\n");
         white=-white;
     }

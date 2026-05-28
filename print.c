@@ -108,6 +108,12 @@ void export_data(FILE *fichier, Piece *pieces, int grid[], int depth, float eval
 }
 
 
+void print_bits(unsigned int n) {
+    for (int i = sizeof(n) * 8 - 1; i >= 0; i--) {
+        printf("%d", (n >> i) & 1);
+    }
+    printf("\n");
+}
 
         // //file open
         // snprintf(filename, sizeof(filename),"data/data_%d.chess", i);

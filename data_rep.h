@@ -1,21 +1,22 @@
 #ifndef DATA_REP_H
 #define DATA_REP_H
 
+#define WHITE_CASLTE_LEFT  (1 << 0)    // 0001
+#define WHITE_CASLTE_RIGHT  (1 << 1)   // 0010
+#define BLACK_CASLTE_LEFT  (1 << 2)    // 0100
+#define BLACK_CASLTE_RIGHT  (1 << 3)   // 1000
+
 typedef struct
 {
    //Piece pieces[32];
-   int en_passant; //=numbre of the piece when en passant is possible
-   int white_castle_right; //=1 when castling is possible
-   int white_castle_left; //=1 when castling is possible
-   int black_castle_right; //=1 when castling is possible
-   int black_castle_left; //=1 when castling is possible
+   unsigned int en_passant; //=numbre of the piece when en passant is possible
+   unsigned int castle_rights; //store castle rights
 }Board;
-
 
 typedef struct {
    char txt;
    float value;
-   int x,y;
+   unsigned int x,y;
 }Piece;
 
 typedef struct {
