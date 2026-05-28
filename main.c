@@ -37,6 +37,51 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
         undo_piece->value = pieces[target].value;
         undo_piece->x = target;
         pieces[target].value=0;
+        //remove castle rights if rook eaten
+        if (pieces[target].txt == 'R'){
+            if (pieces[target].y <= 3){
+                if (pieces[target].x < 4){
+                    if (board->white_castle_left){
+                        board->white_castle_left=0;
+                        undo_piece->y = 1; // used to stock if undo_move should restore castle rights
+                    }
+                }
+                else if (pieces[target].x > 4){
+                    if (board->white_castle_right){
+                        board->white_castle_right=0;
+                        undo_piece->y = 2; // used to stock if undo_move should restore castle rights
+                    }
+                }
+                else if (pieces[target].x == 4){
+                    if (board->white_castle_right){
+                        board->white_castle_left=0;
+                        board->white_castle_right=0;
+                        undo_piece->y = 3; // used to stock if undo_move should restore castle rights
+                    }
+                }
+            }
+            else{
+                if (pieces[target].x < 4){
+                    if (board->black_castle_left){
+                        board->black_castle_left=0;
+                        undo_piece->y = 4; // used to stock if undo_move should restore castle rights 
+                    }
+                }
+                else if (pieces[target].x > 4){
+                    if (board->black_castle_right){
+                        board->black_castle_right=0;
+                        undo_piece->y = 5; // used to stock if undo_move should restore castle rights
+                    }
+                }
+                else if (pieces[target].x == 4){
+                    if (board->black_castle_right){
+                        board->black_castle_left=0;
+                        board->black_castle_right=0;
+                        undo_piece->y = 6; // used to stock if undo_move should restore castle rights
+                    }
+                }
+            }
+        }
     }
     // special rules
     if (move->transform){
@@ -84,31 +129,45 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
             }
         }
         if (pieces[move->piece].txt == 'R' || pieces[move->piece].txt == 'K'){
-            if (pieces[move->piece].y <= 3){
-                if (pieces[move->piece].x <= 4){
+            if (pieces[target].y <= 3){
+                if (pieces[target].x < 4){
                     if (board->white_castle_left){
                         board->white_castle_left=0;
                         undo_piece->y = 1; // used to stock if undo_move should restore castle rights
                     }
                 }
-                if (pieces[move->piece].x >= 4){
+                else if (pieces[target].x > 4){
                     if (board->white_castle_right){
                         board->white_castle_right=0;
-                        undo_piece->y = 1; // used to stock if undo_move should restore castle rights
+                        undo_piece->y = 2; // used to stock if undo_move should restore castle rights
+                    }
+                }
+                else if (pieces[target].x == 4){
+                    if (board->white_castle_right){
+                        board->white_castle_left=0;
+                        board->white_castle_right=0;
+                        undo_piece->y = 3; // used to stock if undo_move should restore castle rights
                     }
                 }
             }
             else{
-                if (pieces[move->piece].x <= 4){
+                if (pieces[target].x < 4){
                     if (board->black_castle_left){
                         board->black_castle_left=0;
-                        undo_piece->y = 1; // used to stock if undo_move should restore castle rights 
+                        undo_piece->y = 4; // used to stock if undo_move should restore castle rights 
                     }
                 }
-                if (pieces[move->piece].x >= 4){
+                else if (pieces[target].x > 4){
                     if (board->black_castle_right){
                         board->black_castle_right=0;
-                        undo_piece->y = 1; // used to stock if undo_move should restore castle rights
+                        undo_piece->y = 5; // used to stock if undo_move should restore castle rights
+                    }
+                }
+                else if (pieces[target].x == 4){
+                    if (board->black_castle_right){
+                        board->black_castle_right=0;
+                        board->black_castle_left=0;
+                        undo_piece->y = 6; // used to stock if undo_move should restore castle rights
                     }
                 }
             }
@@ -130,6 +189,29 @@ void undo_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo_
         pieces[undo_piece->x].x = pieces[move->piece].x;
         pieces[undo_piece->x].y = pieces[move->piece].y;
         grid[pieces[move->piece].x+pieces[move->piece].y*8]=undo_piece->x;
+        //update caslting rights if rook was eaten
+        if (undo_piece->txt == 'R' && undo_piece->y){
+            if (undo_piece->y == 1){
+                board->white_castle_left=1;
+            }
+            else if (undo_piece->y == 2){
+                board->white_castle_right=1;
+            }
+            else if (undo_piece->y == 3){
+                board->white_castle_left=1;
+                board->white_castle_right=1;
+            }
+            else if (undo_piece->y == 4){
+                board->black_castle_left=1;
+            }
+            else if (undo_piece->y == 5){
+                board->black_castle_right=1;
+            }
+            else if (undo_piece->y == 6){
+                board->black_castle_left=1;
+                board->black_castle_right=1;
+            }
+        }
     }
     else{
         grid[pieces[move->piece].x+pieces[move->piece].y*8]=32;
@@ -143,24 +225,27 @@ void undo_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo_
         pieces[move->piece].txt = 'p';
         pieces[move->piece].value = 1;
     }
-    else if (undo_piece->y == 1) // used to stock if undo_move should restore castle rights
+    else if (undo_piece->y) // used to stock if undo_move should restore castle rights
     {
-        if (pieces[move->piece].y <= 3){
-            if (pieces[move->piece].x <= 4){
-                board->white_castle_left=1;
-            }
-            if (pieces[move->piece].x >= 4){
-                board->white_castle_right=1;
-            }
+        if (undo_piece->y == 1){
+            board->white_castle_left=1;
         }
-        else{
-            if (pieces[move->piece].x <= 4){
-                board->black_castle_left=1;
-                //printf("wtf move: %c %d %d \n", pieces[move->piece].txt, move->x, move->y);
-            }
-            if (pieces[move->piece].x >= 4){
-                board->black_castle_right=1;
-            }
+        else if (undo_piece->y == 2){
+            board->white_castle_right=1;
+        }
+        else if (undo_piece->y == 3){
+            board->white_castle_left=1;
+            board->white_castle_right=1;
+        }
+        else if (undo_piece->y == 4){
+            board->black_castle_left=1;
+        }
+        else if (undo_piece->y == 5){
+            board->black_castle_right=1;
+        }
+        else if (undo_piece->y == 6){
+            board->black_castle_left=1;
+            board->black_castle_right=1;
         }
     }
     if (pieces[move->piece].txt == 'K'){
