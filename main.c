@@ -59,6 +59,10 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
         }
     }
     // special rules
+    if (pieces[move->piece].txt == 'p' && (move->y == 2 || move->y == -2)){
+        //en passant
+        board->en_passant = move->piece;
+    }
     if (move->transform){
         pieces[move->piece].txt = move->transform;
         if(move->transform == 'Q'){
@@ -1420,7 +1424,6 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                                 tmp.x=-2;
                                 possible[*fill]=tmp;
                                 *fill += 1;
-                                tmp.x=0;
                             }
                         }
                     }
@@ -1431,7 +1434,6 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                                 tmp.x=2;
                                 possible[*fill]=tmp;
                                 *fill += 1;
-                                tmp.x=0;
                             }
                         }
                     }
@@ -1443,7 +1445,6 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                                 tmp.x=-2;
                                 possible[*fill]=tmp;
                                 *fill += 1;
-                                tmp.x=0;
                             }
                         }
                     }
@@ -1454,7 +1455,6 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                                 tmp.x=2;
                                 possible[*fill]=tmp;
                                 *fill += 1;
-                                tmp.x=0;
                             }
                         }
                     }
@@ -1685,8 +1685,8 @@ int main (int argc, char *argv[]){
     Piece undo_piece = {};
     char lettre;
     short white = 1;
-    srand(2); //10 14 15
-    //srand(time(NULL));  // Seed
+    //srand(2); //10 14 15
+    srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
         move = rnd_best_move(white,pieces,grid,&board,d);

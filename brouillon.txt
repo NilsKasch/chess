@@ -1,6 +1,7 @@
 Improvements:
-- prise en passant
-- rock
+- prise en passants
+
+- undo par copie mémoire.
 
 - minimax entier, et faire l'aléatoire sur l'évaluation finale de la position. Plus rapide.
 
