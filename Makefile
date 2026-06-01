@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=
+CFLAGS=-g
 LDFLAGS=
 EXEC=chess
 SRC= $(wildcard *.c)

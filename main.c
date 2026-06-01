@@ -84,7 +84,7 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
                 else{
                     //move the rook
                     grid[56]=32;
-                    pieces[24].x = 59;
+                    pieces[24].x = 3;
                     grid[59]=24;
                 }
             }
@@ -98,7 +98,7 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
                 else{
                     //move the rook
                     grid[63]=32;
-                    pieces[25].x = 61;
+                    pieces[25].x = 5;
                     grid[61]=25;
                 }
             }
@@ -165,7 +165,7 @@ void undo_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo_
             else{
                 //move the rook
                 grid[56]=24;
-                pieces[24].x = 56;
+                pieces[24].x = 0;
                 grid[59]=32;
             }
         }
@@ -179,7 +179,7 @@ void undo_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo_
             else{
                 //move the rook
                 grid[63]=25;
-                pieces[25].x = 63;
+                pieces[25].x = 7;
                 grid[61]=32;
             }
         }
@@ -978,7 +978,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
             // move forward
             tmp.x=0;
             tmp.y=1*white;
-            if (piece_there(&pieces[i], grid, &tmp)==32 && move_defend_king(pieces, grid, board, &tmp, &white))
+            if (is_on_the_board(&pieces[i],&tmp) && piece_there(&pieces[i], grid, &tmp)==32 && move_defend_king(pieces, grid, board, &tmp, &white))
             {
                 // transform into another piece
                 if ((white == 1 && pieces[i].y == 6) || (white == -1 && pieces[i].y == 1)){
@@ -1004,9 +1004,8 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
             // move forward +2
             tmp.x=0;
             tmp.y=1*white;
-            if (piece_there(&pieces[i], grid, &tmp)==32)
-            {
-                if ((white==1 && pieces[i].y==1) || (white==-1 && pieces[i].y==6)){
+            if ((white==1 && pieces[i].y==1) || (white==-1 && pieces[i].y==6)){
+                if (piece_there(&pieces[i], grid, &tmp)==32){
                     tmp.y=2*white;
                     if (piece_there(&pieces[i], grid, &tmp)==32 && move_defend_king(pieces, grid, board, &tmp, &white))
                     {
@@ -1686,7 +1685,7 @@ int main (int argc, char *argv[]){
     Piece undo_piece = {};
     char lettre;
     short white = 1;
-    srand(19); //10 14 15
+    srand(2); //10 14 15
     //srand(time(NULL));  // Seed
     //main loop
     for (int i = 1; i <= n; i++) {
