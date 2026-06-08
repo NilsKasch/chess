@@ -1541,8 +1541,8 @@ float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha,
 }
 
 void shuffle(Move *possible, int n) {
-    for (int i = n; i > 1; i--) {
-        int j = rand() % i;
+    for (int i = n - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
 
         // swap arr[i] and arr[j]
         Move temp = possible[i];
@@ -1564,12 +1564,6 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
     float alpha = -100000;
     float beta = 100000;
 
-    //Rnd move
-    float possible_values[138] = {};
-    int possible_best_index[138] = {};
-    int equal = 0;
-    int rnd = 0;
-
     if (depth == 0){
         best_value = eval(pieces);
         //printf("value: %f\n", best_value);
@@ -1577,6 +1571,7 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
     }
 
     possible_moves(white, pieces, grid, board, possible, &fill);
+    shuffle(possible, fill);
 
     if (fill==0){
         if (not_defended(23-8*white, pieces, grid, &possible[0], &white)){
@@ -1598,7 +1593,6 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
             //possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1) + (((double)rand() / RAND_MAX) - 0.5)/10;
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
-            possible_values[i] = possible_best; //storage
             if (alpha < possible_best){
                 alpha = possible_best;
                 best = possible[i];
@@ -1619,7 +1613,6 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
             //possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1) + (((double)rand() / RAND_MAX) - 0.5)/10;
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
-            possible_values[i] = possible_best; //storage
             if (possible_best < beta){
                 beta = possible_best;
                 best = possible[i];
@@ -1629,19 +1622,6 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
                 break; // useless alpha = -100000 
             }
         }
-    }
-
-    //Rnd move
-    for (int i=0; i < fill; i++){
-        if (possible_values[i] == best_value){
-            possible_best_index[equal]=i;
-            equal += 1;
-        }
-    }
-    if (equal > 1){
-        rnd = rand() % equal;
-        best=possible[possible_best_index[rnd]];
-        best_value=possible_values[possible_best_index[rnd]];
     }
     printf("value: %f\n", best_value);
     return best;
