@@ -1540,74 +1540,98 @@ float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha,
     }
 }
 
+void shuffle(Move *possible, int n) {
+    for (int i = n; i > 1; i--) {
+        int j = rand() % i;
+
+        // swap arr[i] and arr[j]
+        Move temp = possible[i];
+        possible[i] = possible[j];
+        possible[j] = temp;
+    }
+}
 
 Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int depth){
-    /// TODO:
-    // Mettre une limite max au nombre de coups équivalents random gardées 
-    // (= au bout d'un certain nombre de coups, mettre aplha <= beta)
-    // ne plus retourner de move, mais retourner seulement lévaluation de chaque moves.
+    //minimax
+    Move possible[138] = {};
+    float possible_best;
+    Piece undo_piece = {};
+    int fill = 0;
+
+    //first depth
     Move best = {};
     float best_value = -1000*white;
-    Move tmp = {};
-    Move possible[138] = {};
-    float possible_values[138] = {};
-    int possible_best_index[138] = {};
-    Piece undo_piece = {};
     float alpha = -100000;
     float beta = 100000;
-    int fill = 0;
+
+    //Rnd move
+    float possible_values[138] = {};
+    int possible_best_index[138] = {};
     int equal = 0;
     int rnd = 0;
 
     if (depth == 0){
-        best_value=eval(pieces);
+        best_value = eval(pieces);
+        //printf("value: %f\n", best_value);
         return best;
     }
 
     possible_moves(white, pieces, grid, board, possible, &fill);
 
-    for (int i=0; i < fill; i++){
-        tmp = possible[i];
-        undo_piece.value=0;
-        undo_piece.y=0; // used to stock if undo_move should restore castle rights
-        board->en_passant=0;
-        apply_move(pieces,grid,board,&tmp, &undo_piece);
-        possible_values[i] = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
-        undo_move(pieces,grid,board,&tmp, &undo_piece);
-        // if (white==1)
-        // {
-        //     if (alpha < possible_values[i]){
-        //         alpha = possible_values[i];
-        //     }
-        // }
-        // else
-        // {
-        //     if (possible_values[i] < beta){
-        //         beta = possible_values[i];
-        //     }
-        // }
-        // if (beta < alpha){
-        //     fill = i+1;
-        //     break;
-        // }
-    }
-
-    // select
     if (fill==0){
-        if (not_defended(23-8*white, pieces, grid, &best, &white)){
-            //stalemate
-            best_value=0;
+        if (not_defended(23-8*white, pieces, grid, &possible[0], &white)){
+            //stalemate (possible[0] = no move)
+            best_value = 0;
         }
+        best_value = -1000*white;;
+        //printf("value: %f\n", best_value);
         return best;
     }
-    best_value = possible_values[0];
-    best = possible[0];
-    for (int i=0; i < fill; i++){
-        if (possible_values[i]*white > best_value*white){
-            best_value = possible_values[i];
-            best = possible[i];
+
+    if (white==1)
+    {
+        for (int i=0; i < fill; i++){
+            undo_piece.value=0;
+            undo_piece.y=0; // used to stock if undo_move should restore castle rights
+            board->en_passant=0;
+            apply_move(pieces,grid,board,&possible[i], &undo_piece);
+            //possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1) + (((double)rand() / RAND_MAX) - 0.5)/10;
+            possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
+            undo_move(pieces,grid,board,&possible[i], &undo_piece);
+            possible_values[i] = possible_best; //storage
+            if (alpha < possible_best){
+                alpha = possible_best;
+                best = possible[i];
+                best_value = possible_best;
+            }
+            if (beta < alpha){
+                break; // useless beta = 100000 
+            }
         }
     }
+    else
+    {
+        for (int i=0; i < fill; i++){
+            undo_piece.value=0;
+            undo_piece.y=0; // used to stock if undo_move should restore castle rights
+            board->en_passant=0;
+            apply_move(pieces,grid,board,&possible[i], &undo_piece);
+            //possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1) + (((double)rand() / RAND_MAX) - 0.5)/10;
+            possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
+            undo_move(pieces,grid,board,&possible[i], &undo_piece);
+            possible_values[i] = possible_best; //storage
+            if (possible_best < beta){
+                beta = possible_best;
+                best = possible[i];
+                best_value = possible_best;
+            }
+            if (beta < alpha){
+                break; // useless alpha = -100000 
+            }
+        }
+    }
+
+    //Rnd move
     for (int i=0; i < fill; i++){
         if (possible_values[i] == best_value){
             possible_best_index[equal]=i;
@@ -1622,6 +1646,89 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
     printf("value: %f\n", best_value);
     return best;
 }
+
+
+// Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int depth){
+//     /// TODO:
+//     // Mettre une limite max au nombre de coups équivalents random gardées 
+//     // (= au bout d'un certain nombre de coups, mettre aplha <= beta)
+//     // ne plus retourner de move, mais retourner seulement lévaluation de chaque moves.
+//     Move best = {};
+//     float best_value = -1000*white;
+//     Move tmp = {};
+//     Move possible[138] = {};
+//     float possible_values[138] = {};
+//     int possible_best_index[138] = {};
+//     Piece undo_piece = {};
+//     float alpha = -100000;
+//     float beta = 100000;
+//     int fill = 0;
+//     int equal = 0;
+//     int rnd = 0;
+
+//     if (depth == 0){
+//         best_value=eval(pieces);
+//         return best;
+//     }
+
+//     possible_moves(white, pieces, grid, board, possible, &fill);
+
+//     for (int i=0; i < fill; i++){
+//         tmp = possible[i];
+//         undo_piece.value=0;
+//         undo_piece.y=0; // used to stock if undo_move should restore castle rights
+//         board->en_passant=0;
+//         apply_move(pieces,grid,board,&tmp, &undo_piece);
+//         possible_values[i] = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
+//         undo_move(pieces,grid,board,&tmp, &undo_piece);
+//         // if (white==1)
+//         // {
+//         //     if (alpha < possible_values[i]){
+//         //         alpha = possible_values[i];
+//         //     }
+//         // }
+//         // else
+//         // {
+//         //     if (possible_values[i] < beta){
+//         //         beta = possible_values[i];
+//         //     }
+//         // }
+//         // if (beta < alpha){
+//         //     fill = i+1;
+//         //     break;
+//         // }
+//     }
+
+//     // select
+//     if (fill==0){
+//         if (not_defended(23-8*white, pieces, grid, &best, &white)){
+//             //stalemate
+//             best_value=0;
+//         }
+//         return best;
+//     }
+//     best_value = possible_values[0];
+//     best = possible[0];
+//     for (int i=0; i < fill; i++){
+//         if (possible_values[i]*white > best_value*white){
+//             best_value = possible_values[i];
+//             best = possible[i];
+//         }
+//     }
+//     for (int i=0; i < fill; i++){
+//         if (possible_values[i] == best_value){
+//             possible_best_index[equal]=i;
+//             equal += 1;
+//         }
+//     }
+//     if (equal > 1){
+//         rnd = rand() % equal;
+//         best=possible[possible_best_index[rnd]];
+//         best_value=possible_values[possible_best_index[rnd]];
+//     }
+//     printf("value: %f\n", best_value);
+//     return best;
+// }
 
 int main (int argc, char *argv[]){
     int n,d;

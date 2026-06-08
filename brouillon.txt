@@ -1,7 +1,7 @@
 Improvements:
-- undo par copie mémoire.
+- undo par copie mémoire: Plus lent sans bitboard
 
-- minimax entier, et faire l'aléatoire sur l'évaluation finale de la position. Plus rapide.
+- minimax entier, et faire l'aléatoire sur l'évaluation finale de la position: moins rapide.
 
 - max 3 répétitions, et max 50 coups sans mouvement de pions ni prises
 - nul car il n'y a de possibilité pour aucun des deux camps de mettre échec et mat le camp adverse par manque de pièces (exemple : roi contre roi) ou parce qu'il n'existe aucune suite de coups qui puisse conduire à un mat ;
