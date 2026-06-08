@@ -1627,89 +1627,6 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
     return best;
 }
 
-
-// Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int depth){
-//     /// TODO:
-//     // Mettre une limite max au nombre de coups équivalents random gardées 
-//     // (= au bout d'un certain nombre de coups, mettre aplha <= beta)
-//     // ne plus retourner de move, mais retourner seulement lévaluation de chaque moves.
-//     Move best = {};
-//     float best_value = -1000*white;
-//     Move tmp = {};
-//     Move possible[138] = {};
-//     float possible_values[138] = {};
-//     int possible_best_index[138] = {};
-//     Piece undo_piece = {};
-//     float alpha = -100000;
-//     float beta = 100000;
-//     int fill = 0;
-//     int equal = 0;
-//     int rnd = 0;
-
-//     if (depth == 0){
-//         best_value=eval(pieces);
-//         return best;
-//     }
-
-//     possible_moves(white, pieces, grid, board, possible, &fill);
-
-//     for (int i=0; i < fill; i++){
-//         tmp = possible[i];
-//         undo_piece.value=0;
-//         undo_piece.y=0; // used to stock if undo_move should restore castle rights
-//         board->en_passant=0;
-//         apply_move(pieces,grid,board,&tmp, &undo_piece);
-//         possible_values[i] = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
-//         undo_move(pieces,grid,board,&tmp, &undo_piece);
-//         // if (white==1)
-//         // {
-//         //     if (alpha < possible_values[i]){
-//         //         alpha = possible_values[i];
-//         //     }
-//         // }
-//         // else
-//         // {
-//         //     if (possible_values[i] < beta){
-//         //         beta = possible_values[i];
-//         //     }
-//         // }
-//         // if (beta < alpha){
-//         //     fill = i+1;
-//         //     break;
-//         // }
-//     }
-
-//     // select
-//     if (fill==0){
-//         if (not_defended(23-8*white, pieces, grid, &best, &white)){
-//             //stalemate
-//             best_value=0;
-//         }
-//         return best;
-//     }
-//     best_value = possible_values[0];
-//     best = possible[0];
-//     for (int i=0; i < fill; i++){
-//         if (possible_values[i]*white > best_value*white){
-//             best_value = possible_values[i];
-//             best = possible[i];
-//         }
-//     }
-//     for (int i=0; i < fill; i++){
-//         if (possible_values[i] == best_value){
-//             possible_best_index[equal]=i;
-//             equal += 1;
-//         }
-//     }
-//     if (equal > 1){
-//         rnd = rand() % equal;
-//         best=possible[possible_best_index[rnd]];
-//         best_value=possible_values[possible_best_index[rnd]];
-//     }
-//     printf("value: %f\n", best_value);
-//     return best;
-// }
-
 int main (int argc, char *argv[]){
     int n,d;
     if (argc == 3)
@@ -1819,7 +1736,7 @@ int main (int argc, char *argv[]){
         plot_grid(pieces,grid);
         printf("board");
         //print_bits(board.castle_rights);
-        printf("en passant: %d\n",board.en_passant);
+        //printf("en passant: %d\n",board.en_passant);
         printf("\n");
         white=-white;
     }
