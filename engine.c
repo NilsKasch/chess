@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "data_rep.h"
+#include "engine.h"
 
 float eval(Piece *pieces){
     float sum=0;
@@ -1621,6 +1622,6 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
             }
         }
     }
-    printf("value: %f\n", best_value);
+    if (!g_uci_mode) printf("value: %f\n", best_value);
     return best;
 }

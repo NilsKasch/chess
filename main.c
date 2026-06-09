@@ -4,10 +4,16 @@
 #include "data_rep.h"
 #include "engine.h"
 #include "print.h"
+#include "uci.h"
 
 int main (int argc, char *argv[]){
     int n,d;
-    if (argc == 3)
+    if (argc == 1)
+    {
+        uci_loop();
+        return 0;
+    }
+    else if (argc == 3)
     {
         char *end;
         n = strtol(argv[1], &end, 10);
