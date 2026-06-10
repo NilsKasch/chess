@@ -3,6 +3,7 @@
 #include "fen.h"
 
 static int char_to_value(char c) {
+    //return piece value
     switch (tolower(c)) {
         case 'p': return 1;
         case 'n': case 'b': return 3;
@@ -14,6 +15,7 @@ static int char_to_value(char c) {
 }
 
 static char fen_to_internal(char c) {
+    //return right case
     if (tolower(c) == 'p') return 'p';
     return toupper(c);
 }
