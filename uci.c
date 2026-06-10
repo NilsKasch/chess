@@ -130,7 +130,7 @@ void uci_loop(void) {
         line[strcspn(line, "\n")] = 0;
 
         if (strcmp(line, "uci") == 0) {
-            printf("id name ChessEngine\n");
+            printf("id name BoB\n");
             printf("id author Nils\n");
             printf("uciok\n");
             fflush(stdout);
