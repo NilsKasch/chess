@@ -128,7 +128,7 @@ int parse_fen(const char *fen, Piece *pieces, int *grid, Board *board, short *wh
         }
     }
 
-    board->en_passant = 0;
+    board->en_passant = 32;
     if (strcmp(fields[3], "-") != 0) {
         int fx = fields[3][0] - 'a';
         int fy = fields[3][1] - '1';

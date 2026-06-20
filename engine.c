@@ -981,10 +981,11 @@ int possible_to_castle_black_right(Piece pieces[], int grid[]){
 int move_defend_king(Piece pieces[], int grid[], Board *board, Move *move, short *white){
     Piece undo_piece = {};
     Move tmp = {};
+    unsigned int saved_en_passant = board->en_passant;
     apply_move(pieces,grid,board,move, &undo_piece);
     int not_attacked = not_defended(23-8*(*white), pieces, grid, &tmp, white);
     undo_move(pieces,grid,board,move, &undo_piece);
-    board->en_passant=0;
+    board->en_passant = saved_en_passant;
     return not_attacked;
 }
 
@@ -1087,18 +1088,18 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                 *fill += 1;
             }
             //en passant
-            if (board->en_passant){
+            if (board->en_passant != 32){
                 // left
                 tmp.x=-1;
                 tmp.y=1*white;
-                if ((pieces[i].x == pieces[board->en_passant].x + 1) && (pieces[i].y == pieces[board->en_passant].y)){
+                if ((pieces[i].x == pieces[board->en_passant].x + 1) && (pieces[i].y == pieces[board->en_passant].y) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
                 // right
                 tmp.x=+1;
                 tmp.y=1*white;
-                if ((pieces[i].x == pieces[board->en_passant].x - 1) && (pieces[i].y == pieces[board->en_passant].y)){
+                if ((pieces[i].x == pieces[board->en_passant].x - 1) && (pieces[i].y == pieces[board->en_passant].y) && move_defend_king(pieces, grid, board, &tmp, &white)){
                     possible[*fill]=tmp;
                     *fill += 1;
                 }
@@ -1526,7 +1527,7 @@ float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha,
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
-            board->en_passant=0;
+            board->en_passant=32;
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
@@ -1544,7 +1545,7 @@ float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha,
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
-            board->en_passant=0;
+            board->en_passant=32;
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
@@ -1597,7 +1598,9 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
             //stalemate (possible[0] = no move)
             best_value = 0;
         }
-        best_value = -1000*white;;
+        else{
+            best_value = -1000*white;;
+        }
         //printf("value: %f\n", best_value);
         return best;
     }
@@ -1607,7 +1610,7 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
-            board->en_passant=0;
+            board->en_passant=32;
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             //possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1) + (((double)rand() / RAND_MAX) - 0.5)/10;
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
@@ -1627,7 +1630,7 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
-            board->en_passant=0;
+            board->en_passant=32;
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             //possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1) + (((double)rand() / RAND_MAX) - 0.5)/10;
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);

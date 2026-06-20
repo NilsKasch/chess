@@ -74,7 +74,7 @@ int main (int argc, char *argv[]){
         {'K',1000,4,7}
     };
 
-    Board board = {0,(WHITE_CASLTE_LEFT | WHITE_CASLTE_RIGHT | BLACK_CASLTE_LEFT | BLACK_CASLTE_RIGHT)};
+    Board board = {32,(WHITE_CASLTE_LEFT | WHITE_CASLTE_RIGHT | BLACK_CASLTE_LEFT | BLACK_CASLTE_RIGHT)};
 
     int grid[64]={};
     for (int i = 0; i < 64; i++) {
