@@ -156,6 +156,7 @@ void undo_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo_
         if (pieces[move->piece].y != pieces[undo_piece->x].y){ 
             // en passant         
             grid[pieces[move->piece].x+pieces[undo_piece->x].y*8]=undo_piece->x;
+            grid[pieces[move->piece].x+pieces[move->piece].y*8]=32;
         }
         else{ 
             //normal case
