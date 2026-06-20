@@ -1508,20 +1508,39 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
     }
 }
 
-void order_moves(Move possible[], int fill, Piece *pieces, int grid[]){
+void order_moves(Move possible[], int fill, Piece *pieces, int grid[], short *white){
     float scores[138];
     for (int i = 0; i < fill; i++) {
-        int target = grid[(pieces[possible[i].piece].x + possible[i].x) + (pieces[possible[i].piece].y + possible[i].y) * 8];
+        int x_target=pieces[possible[i].piece].x + possible[i].x;
+        int y_target=pieces[possible[i].piece].y + possible[i].y;
+        int target = grid[x_target + y_target * 8];
+        scores[i] = 0;
         if (target != 32) {
             // prioritise capturing opponent most valuable piece with our least valuable piece
-            scores[i] = pieces[target].value;
-        } else if (possible[i].transform) {
+            scores[i] = pieces[target].value;// - pieces[possible[i].piece].value;
+        }
+        if (possible[i].transform) {
             // prioritise promotion
-            if (possible[i].transform == 'Q') scores[i] = 9;
-            else if (possible[i].transform == 'R') scores[i] = 5;
-            else scores[i] = 3;
-        } else {
-            scores[i] = 0;
+            if (possible[i].transform == 'Q') scores[i] += 9;
+            else if (possible[i].transform == 'R') scores[i] += 5;
+            else scores[i] += 3;
+        }
+        y_target += *white;
+        if (0 <= y_target && y_target < 8){
+            x_target += 1;
+            if (0 <= x_target && x_target < 8){
+                if ((pieces[grid[x_target + y_target * 8]].txt == 'p')){
+                    //penalize moving to a square protected by a pawn
+                    scores[i] -= pieces[possible[i].piece].value;
+                }
+            }
+            x_target -= 2;
+            if (0 <= x_target && x_target < 8){
+                if ((pieces[grid[x_target + y_target * 8]].txt == 'p')){
+                    //penalize moving to a square protected by a pawn
+                    scores[i] -= pieces[possible[i].piece].value;
+                }
+            }
         }
     }
     for (int i = 0; i < fill - 1; i++) {
@@ -1549,7 +1568,7 @@ float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha,
     }
 
     possible_moves(white, pieces, grid, board, possible, &fill);
-    order_moves(possible, fill, pieces, grid);
+    order_moves(possible, fill, pieces, grid, &white);
 
     if (fill==0){
         if (not_defended(23-8*white, pieces, grid, &possible[0], &white)){
@@ -1627,7 +1646,7 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
 
     possible_moves(white, pieces, grid, board, possible, &fill);
     shuffle(possible, fill);
-    //order_moves(possible, fill, pieces, grid);
+    //order_moves(possible, fill, pieces, grid, &white);
 
     if (fill==0){
         if (not_defended(23-8*white, pieces, grid, &possible[0], &white)){
