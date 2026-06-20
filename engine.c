@@ -74,8 +74,9 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
     }
 
     // special rules
+    // update en passant rights
+    board->en_passant=32;
     if (pieces[move->piece].txt == 'p' && (move->y == 2 || move->y == -2)){
-        //update en passant rights
         board->en_passant = move->piece;
     }
     if (move->transform){
@@ -1532,7 +1533,6 @@ float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha,
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
-            board->en_passant=32;
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
@@ -1550,7 +1550,6 @@ float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha,
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
-            board->en_passant=32;
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
@@ -1615,7 +1614,6 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
-            board->en_passant=32;
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             //possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1) + (((double)rand() / RAND_MAX) - 0.5)/10;
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
@@ -1635,7 +1633,6 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
-            board->en_passant=32;
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             //possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1) + (((double)rand() / RAND_MAX) - 0.5)/10;
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
