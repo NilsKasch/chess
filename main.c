@@ -8,6 +8,7 @@
 
 int main (int argc, char *argv[]){
     int n,d;
+    srand(time(NULL));  // Seed
     if (argc == 1)
     {
         uci_loop();
@@ -95,7 +96,7 @@ int main (int argc, char *argv[]){
     char lettre;
     short white = 1;
     //srand(2); //10 14 15
-    srand(time(NULL));  // Seed
+
     //main loop
     for (int i = 1; i <= n; i++) {
         move = rnd_best_move(white,pieces,grid,&board,d);
