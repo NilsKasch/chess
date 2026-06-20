@@ -89,12 +89,12 @@ static void handle_position(const char *line, Piece *pieces, int *grid, Board *b
 }
 
 static void handle_go(const char *line, short white, Piece *pieces, int *grid, Board *board) {
-    int depth = 5;
+    int depth = 6;
     if (sscanf(line, "go depth %d", &depth) == 1) {
     } else if (strstr(line, "go movetime") != NULL || strstr(line, "go wtime") != NULL) {
-        depth = 5;
+        depth = 6;
     } else if (strstr(line, "go infinite") != NULL) {
-        depth = 5;
+        depth = 6;
     } else if (strstr(line, "go perft") != NULL) {
         printf("bestmove 0000\n");
         return;
