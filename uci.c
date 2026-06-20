@@ -102,6 +102,7 @@ static void handle_go(const char *line, short white, Piece *pieces, int *grid, B
 
     Move best = rnd_best_move(white, pieces, grid, board, depth);
 
+
     if (best.x == 0 && best.y == 0) {
         printf("bestmove 0000\n");
     } else {
@@ -131,15 +132,14 @@ void uci_loop(void) {
 
         if (strcmp(line, "uci") == 0) {
             printf("id name BoB\n");
-            printf("id author Nils\n");
+            printf("id author Nils Kasch\n");
             printf("uciok\n");
             fflush(stdout);
         } else if (strcmp(line, "isready") == 0) {
             printf("readyok\n");
             fflush(stdout);
         } else if (strcmp(line, "ucinewgame") == 0) {
-            parse_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-                      pieces, grid, &board, &white);
+            parse_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", pieces, grid, &board, &white);
             white = 1;
         } else if (strncmp(line, "position", 8) == 0) {
             handle_position(line, pieces, grid, &board, &white);

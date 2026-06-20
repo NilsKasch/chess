@@ -1509,7 +1509,7 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
 }
 
 void order_moves(Move possible[], int fill, Piece *pieces, int grid[], short *white){
-    float scores[138];
+    float scores[218];
     for (int i = 0; i < fill; i++) {
         int x_target=pieces[possible[i].piece].x + possible[i].x;
         int y_target=pieces[possible[i].piece].y + possible[i].y;
@@ -1557,11 +1557,12 @@ void order_moves(Move possible[], int fill, Piece *pieces, int grid[], short *wh
     }
 }
 
-float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha, float beta, int depth){
-    Move possible[138] = {};
+float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha, float beta, int depth, int *count){
+    Move possible[218] = {};
     float possible_best;
     Piece undo_piece = {};
     int fill = 0;
+    *count +=1;
 
     if (depth == 0){
         return eval(pieces);
@@ -1584,7 +1585,7 @@ float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha,
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
-            possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
+            possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1, count);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
             if (alpha < possible_best){
                 alpha = possible_best;
@@ -1601,7 +1602,7 @@ float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha,
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
-            possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
+            possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1, count);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
             if (possible_best < beta){
                 beta = possible_best;
@@ -1627,10 +1628,11 @@ void shuffle(Move *possible, int n) {
 
 Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int depth){
     //minimax
-    Move possible[138] = {};
+    Move possible[218] = {};
     float possible_best;
     Piece undo_piece = {};
     int fill = 0;
+    int count=0;
 
     //first depth
     Move best = {};
@@ -1646,7 +1648,7 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
 
     possible_moves(white, pieces, grid, board, possible, &fill);
     shuffle(possible, fill);
-    //order_moves(possible, fill, pieces, grid, &white);
+    order_moves(possible, fill, pieces, grid, &white);
 
     if (fill==0){
         if (not_defended(23-8*white, pieces, grid, &possible[0], &white)){
@@ -1667,7 +1669,7 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             //possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1) + (((double)rand() / RAND_MAX) - 0.5)/10;
-            possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
+            possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1, &count);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
             if (alpha < possible_best){
                 alpha = possible_best;
@@ -1686,7 +1688,7 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             //possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1) + (((double)rand() / RAND_MAX) - 0.5)/10;
-            possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1);
+            possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1, &count);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
             if (possible_best < beta){
                 beta = possible_best;
@@ -1699,5 +1701,8 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
         }
     }
     if (!g_uci_mode) printf("value: %f\n", best_value);
+    printf("info depth %d nodes %d score cp %d\n", depth, count, (int)(best_value * 10 * white));
     return best;
 }
+
+//void iterative_deepen_to(short white, Piece *pieces, int grid[], Board *board,  int depth, int *count)
