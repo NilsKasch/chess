@@ -57,9 +57,25 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
             }
         }
     }
+    // apply en passant move (target==32)
+    else if (pieces[move->piece].txt == 'p' && (move->x == 1 || move->x == -1)){
+        if (pieces[move->piece].y < 4){
+            //white eaten
+            target=grid[(pieces[move->piece].x+(move->x))+(pieces[move->piece].y+(move->y)+1)*8];
+        }
+        else{
+            //black eaten
+            target=grid[(pieces[move->piece].x+(move->x))+(pieces[move->piece].y+(move->y)-1)*8];
+        }
+        undo_piece->txt = pieces[target].txt;
+        undo_piece->value = pieces[target].value;
+        undo_piece->x = target;
+        pieces[target].value=0;
+    }
+
     // special rules
     if (pieces[move->piece].txt == 'p' && (move->y == 2 || move->y == -2)){
-        //en passant
+        //update en passant rights
         board->en_passant = move->piece;
     }
     if (move->transform){
@@ -136,11 +152,15 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
 void undo_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo_piece){
     //Don't work with x=0 and y=0 move
     if (undo_piece->value > 0){
-        pieces[undo_piece->x].txt = undo_piece->txt;
         pieces[undo_piece->x].value = undo_piece->value;
-        pieces[undo_piece->x].x = pieces[move->piece].x;
-        pieces[undo_piece->x].y = pieces[move->piece].y;
-        grid[pieces[move->piece].x+pieces[move->piece].y*8]=undo_piece->x;
+        if (pieces[move->piece].y != pieces[undo_piece->x].y){ 
+            // en passant         
+            grid[pieces[move->piece].x+pieces[undo_piece->x].y*8]=undo_piece->x;
+        }
+        else{ 
+            //normal case
+            grid[pieces[move->piece].x+pieces[move->piece].y*8]=undo_piece->x;
+        }
     }
     else{
         grid[pieces[move->piece].x+pieces[move->piece].y*8]=32;
