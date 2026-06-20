@@ -1508,6 +1508,36 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
     }
 }
 
+void order_moves(Move possible[], int fill, Piece *pieces, int grid[]){
+    float scores[138];
+    for (int i = 0; i < fill; i++) {
+        int target = grid[(pieces[possible[i].piece].x + possible[i].x) + (pieces[possible[i].piece].y + possible[i].y) * 8];
+        if (target != 32) {
+            // prioritise capturing opponent most valuable piece with our least valuable piece
+            scores[i] = pieces[target].value;
+        } else if (possible[i].transform) {
+            // prioritise promotion
+            if (possible[i].transform == 'Q') scores[i] = 9;
+            else if (possible[i].transform == 'R') scores[i] = 5;
+            else scores[i] = 3;
+        } else {
+            scores[i] = 0;
+        }
+    }
+    for (int i = 0; i < fill - 1; i++) {
+        for (int j = i + 1; j < fill; j++) {
+            if (scores[i] < scores[j]) {
+                float tmp_score = scores[i];
+                scores[i] = scores[j];
+                scores[j] = tmp_score;
+                Move tmp_move = possible[i];
+                possible[i] = possible[j];
+                possible[j] = tmp_move;
+            }
+        }
+    }
+}
+
 float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha, float beta, int depth){
     Move possible[138] = {};
     float possible_best;
@@ -1519,6 +1549,7 @@ float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha,
     }
 
     possible_moves(white, pieces, grid, board, possible, &fill);
+    order_moves(possible, fill, pieces, grid);
 
     if (fill==0){
         if (not_defended(23-8*white, pieces, grid, &possible[0], &white)){
@@ -1596,6 +1627,7 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
 
     possible_moves(white, pieces, grid, board, possible, &fill);
     shuffle(possible, fill);
+    //order_moves(possible, fill, pieces, grid);
 
     if (fill==0){
         if (not_defended(23-8*white, pieces, grid, &possible[0], &white)){
