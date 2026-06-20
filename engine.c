@@ -1061,8 +1061,10 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     *fill += 1;
                     tmp.transform = 0;
                 }
-                possible[*fill]=tmp;
-                *fill += 1;
+                else{
+                    possible[*fill]=tmp;
+                    *fill += 1;
+                }
             }
             // eat on the right (for white, and left for black)
             tmp.x=1;
@@ -1085,8 +1087,10 @@ void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move p
                     *fill += 1;
                     tmp.transform = 0;
                 }
-                possible[*fill]=tmp;
-                *fill += 1;
+                else{
+                    possible[*fill]=tmp;
+                    *fill += 1;
+                }
             }
             //en passant
             if (board->en_passant != 32){

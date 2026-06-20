@@ -8,7 +8,8 @@
 
 int main (int argc, char *argv[]){
     int n,d;
-    srand(time(NULL));  // Seed
+    //srand(time(NULL));  // Seed
+    srand(2);
     if (argc == 1)
     {
         uci_loop();
