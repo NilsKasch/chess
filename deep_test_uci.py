@@ -30,6 +30,29 @@ def test_play_five_games():
             print(f"  Game {game_num}: {move_count} moves, "
                   f"result={board.outcome().result() if board.outcome() else 'unknown'}")
 
+def test_play_a_long_game():
+    """Play one long game at depth 5, verify all moves legal, no crashes."""
+    game_num=1
+    with chess.engine.SimpleEngine.popen_uci(ENGINE) as engine:
+        board = chess.Board()
+        move_count = 0
+        while not board.is_game_over() and move_count < 1000:
+            try:
+                result = engine.play(board, chess.engine.Limit(depth=5))
+            except Exception as e:
+                print(f"\nGame {game_num} crashed at move {move_count}: {e}")
+                print(f"Position FEN: {board.fen()}")
+                raise
+            if result.move is None:
+                break
+            assert result.move in board.legal_moves, (
+                f"Game {game_num} move {move_count}: {result.move} not legal in {board.fen()}"
+            )
+            board.push(result.move)
+            move_count += 1
+        print(f"  Game {game_num}: {move_count} moves, "
+                f"result={board.outcome().result() if board.outcome() else 'unknown'}")
+
 
 def test_play_both_sides():
     """Play a game where engine alternates white/black each game."""
