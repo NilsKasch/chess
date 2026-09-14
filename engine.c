@@ -1705,4 +1705,71 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
     return best;
 }
 
-//void iterative_deepen_to(short white, Piece *pieces, int grid[], Board *board,  int depth, int *count)
+
+float minimax_pv(Move *pv, short white, Piece *pieces, int grid[], Board *board, float alpha, float beta, int depth, int max_depth, int *count){
+    Move possible[218] = {};
+    float possible_best;
+    Piece undo_piece = {};
+    int fill = 0;
+    *count +=1;
+
+    if (depth == 0){
+        return eval(pieces);
+    }
+
+    possible_moves(white, pieces, grid, board, possible, &fill);
+    if (depth==max_depth) shuffle(possible, fill); // a mettre dans une fonctione séparé plus tard
+    order_moves(possible, fill, pieces, grid, &white);
+
+    if (fill==0){
+        if (not_defended(23-8*white, pieces, grid, &possible[0], &white)){
+            //stalemate (possible[0] = no move)
+            pv[max_depth-depth].x=0;
+            pv[max_depth-depth].y=0;
+            return 0;
+        }
+        return -1000*white;;
+    }
+
+    if (white==1)
+    {
+        for (int i=0; i < fill; i++){
+            undo_piece.value=0;
+            undo_piece.y=0; // used to stock if undo_move should restore castle rights
+            apply_move(pieces,grid,board,&possible[i], &undo_piece);
+            possible_best = minimax_pv(pv, -white, pieces, grid, board, alpha, beta, depth - 1, max_depth, count);
+            undo_move(pieces,grid,board,&possible[i], &undo_piece);
+            if (alpha < possible_best){
+                alpha = possible_best;
+                pv[max_depth-depth] = possible[i];
+            }
+            if (beta <= alpha){
+                break;
+            }
+        }
+        //if (!g_uci_mode) printf("value: %f\n", alpha);
+        //if (depth==max_depth) printf("info depth %d nodes %d score cp %d\n", depth, *count, (int)(alpha * 10 * white));
+        return alpha;
+    }
+    else
+    {
+        for (int i=0; i < fill; i++){
+            undo_piece.value=0;
+            undo_piece.y=0; // used to stock if undo_move should restore castle rights
+            apply_move(pieces,grid,board,&possible[i], &undo_piece);
+            possible_best = minimax_pv(pv, -white, pieces, grid, board, alpha, beta, depth - 1, max_depth, count);
+            undo_move(pieces,grid,board,&possible[i], &undo_piece);
+            if (possible_best < beta){
+                beta = possible_best;
+                pv[max_depth-depth] = possible[i];
+            }
+            if (beta <= alpha){
+                break;
+            }
+        }
+        //if (!g_uci_mode) printf("value: %f\n", beta);
+        //if (depth==max_depth) printf("info depth %d nodes %d score cp %d\n", depth, *count, (int)(beta * 10 * white));
+        return beta;
+    }
+}
+
