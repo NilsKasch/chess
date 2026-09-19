@@ -7,6 +7,31 @@ import sys
 ENGINE = "./chess"
 
 
+def _read_bestmove(proc, timeout=30):
+    """Lit les lignes jusqu'à bestmove en ignorant les info intermédiaires.
+
+    L'engine envoie par ex. `info depth 1 nodes 2 score cp 0 pv h8h7`
+    à chaque profondeur avant le `bestmove` final. On ne doit FAIL que
+    si on ne reçoit jamais de bestmove.
+    """
+    end = time.time() + timeout
+    while True:
+        if time.time() > end:
+            raise AssertionError("Timeout: bestmove jamais reçu (que des info ?)")
+        line = proc.stdout.readline()
+        if not line:
+            continue
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith("info"):
+            continue
+        if line.startswith("bestmove"):
+            return line
+        # Ignore toute autre ligne intermédiaire, continue jusqu'à bestmove
+        continue
+
+
 def test_play_five_games():
     """Play 5 full games at depth 5, verify all moves legal, no crashes."""
     for game_num in range(1, 6):
@@ -192,7 +217,7 @@ def test_raw_stalemate():
         proc.stdin.flush()
         proc.stdin.write("go depth 5\n")
         proc.stdin.flush()
-        line = proc.stdout.readline().strip()
+        line = _read_bestmove(proc)
         assert line.startswith("bestmove"), f"Expected bestmove, got: {line}"
         print(f"  Stalemate: {line}")
         proc.stdin.write("quit\n")
@@ -217,7 +242,7 @@ def test_raw_checkmate_and_resign():
         proc.stdin.flush()
         proc.stdin.write("go depth 5\n")
         proc.stdin.flush()
-        line = proc.stdout.readline().strip()
+        line = _read_bestmove(proc)
         assert line.startswith("bestmove"), f"Expected bestmove, got: {line}"
         print(f"  Checkmate: {line}")
         proc.stdin.write("quit\n")
@@ -238,7 +263,7 @@ def test_raw_fen_with_en_passant():
         proc.stdin.flush()
         proc.stdin.write("go depth 5\n")
         proc.stdin.flush()
-        line = proc.stdout.readline().strip()
+        line = _read_bestmove(proc)
         assert line.startswith("bestmove"), f"Expected bestmove, got: {line}"
         print(f"  FEN with EP: {line}")
         proc.stdin.write("quit\n")

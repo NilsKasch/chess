@@ -6,6 +6,30 @@ import sys
 
 ENGINE = "./chess"
 
+def _read_bestmove(proc, timeout=30):
+    """Lit les lignes jusqu'à bestmove en ignorant les info intermédiaires.
+
+    L'engine envoie par ex. `info depth 1 nodes 2 score cp 0 pv h8h7`
+    à chaque profondeur avant le `bestmove` final. On ne doit FAIL que
+    si on ne reçoit jamais de bestmove.
+    """
+    end = time.time() + timeout
+    while True:
+        if time.time() > end:
+            raise AssertionError("Timeout: bestmove jamais reçu (que des info ?)")
+        line = proc.stdout.readline()
+        if not line:
+            continue
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith("info"):
+            continue
+        if line.startswith("bestmove"):
+            return line
+        # Ignore toute autre ligne intermédiaire, continue jusqu'à bestmove
+        continue
+
 
 def test_raw_uci_handshake():
     with subprocess.Popen([ENGINE], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
@@ -44,7 +68,7 @@ def test_raw_checkmate():
         proc.stdin.flush()
         proc.stdin.write("go depth 2\n")
         proc.stdin.flush()
-        line = proc.stdout.readline().strip()
+        line = _read_bestmove(proc)
         assert line.startswith("bestmove"), f"Expected bestmove, got: {line}"
         proc.stdin.write("quit\n")
         proc.stdin.flush()
