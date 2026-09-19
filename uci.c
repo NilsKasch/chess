@@ -24,6 +24,18 @@ void move_to_uci(Move *move, Piece *pieces, char *buf) {
     }
 }
 
+void abs_move_to_uci(Absolute_Move *move, char *buf) {
+    buf[0] = 'a' + move->fx;
+    buf[1] = '1' + move->fy;
+    buf[2] = 'a' + move->tx;
+    buf[3] = '1' + move->ty;
+    buf[4] = '\0';
+    if (move->transform) {
+        buf[4] = move->transform + 32;
+        buf[5] = '\0';
+    }
+}
+
 static void handle_position(const char *line, Piece *pieces, int *grid, Board *board, short *white) {
     const char *p = line + 9;
     while (*p == ' ') p++;
@@ -89,11 +101,10 @@ static void handle_position(const char *line, Piece *pieces, int *grid, Board *b
 }
 
 //TODO move it to search.c in the future
-void iterative_deepen(short white, Piece *pieces, int grid[], Board *board, int depth, Move *pv){
+void iterative_deepen(short white, Piece *pieces, int grid[], Board *board, int depth, Absolute_Move *pv){
     int max_depth = depth;
     int d=1;
     int count=0;
-    //Move pv[100] = {};
     char uci_buf[6];
 
     float best_value = -1000*white;
@@ -105,7 +116,8 @@ void iterative_deepen(short white, Piece *pieces, int grid[], Board *board, int 
         best_value = minimax_pv(pv, white, pieces, grid, board, alpha, beta, d, d, &count); //TODO change shuffel not every time
         printf("info depth %d nodes %d score cp %d pv", d, count, (int)(best_value * 10 * white));
         for (int i = 0; i < d; i++) {
-            move_to_uci(&pv[i], pieces, uci_buf);
+            if (pv[i].fx == pv[i].tx && pv[i].fy == pv[i].ty) break; // null terminator
+            abs_move_to_uci(&pv[i], uci_buf);
             printf(" %s", uci_buf);
         }
         printf("\n");
@@ -125,17 +137,17 @@ static void handle_go(const char *line, short white, Piece *pieces, int *grid, B
         return;
     }
 
-    Move pv[100] = {};
+    Absolute_Move pv[100] = {};
     iterative_deepen(white, pieces, grid, board, depth, pv);
     //Move best = rnd_best_move(white, pieces, grid, board, depth);
-    Move best = pv[0];
+    Absolute_Move best = pv[0];
 
 
-    if (best.x == 0 && best.y == 0) {
+    if (best.fx == best.tx && best.fy == best.ty) {
         printf("bestmove 0000\n");
     } else {
         char uci_move[6];
-        move_to_uci(&best, pieces, uci_move);
+        abs_move_to_uci(&best, uci_move);
         printf("bestmove %s\n", uci_move);
     }
 }

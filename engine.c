@@ -1706,7 +1706,7 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
 }
 
 
-float minimax_pv(Move *pv, short white, Piece *pieces, int grid[], Board *board, float alpha, float beta, int depth, int max_depth, int *count){
+float minimax_pv(Absolute_Move *pv, short white, Piece *pieces, int grid[], Board *board, float alpha, float beta, int depth, int max_depth, int *count){
     Move possible[218] = {};
     float possible_best;
     Piece undo_piece = {};
@@ -1722,10 +1722,10 @@ float minimax_pv(Move *pv, short white, Piece *pieces, int grid[], Board *board,
     order_moves(possible, fill, pieces, grid, &white);
 
     if (fill==0){
+        // No legal move: terminate PV line (null = from == to).
+        pv[max_depth-depth].fx = 0; pv[max_depth-depth].fy = 0; pv[max_depth-depth].tx = 0; pv[max_depth-depth].ty = 0; pv[max_depth-depth].transform = 0;
         if (not_defended(23-8*white, pieces, grid, &possible[0], &white)){
             //stalemate (possible[0] = no move)
-            pv[max_depth-depth].x=0;
-            pv[max_depth-depth].y=0;
             return 0;
         }
         return -1000*white;;
@@ -1741,7 +1741,14 @@ float minimax_pv(Move *pv, short white, Piece *pieces, int grid[], Board *board,
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
             if (alpha < possible_best){
                 alpha = possible_best;
-                pv[max_depth-depth] = possible[i];
+                // Convert relative Move to absolute using restored (pre-move) position.
+                int fx = pieces[possible[i].piece].x;
+                int fy = pieces[possible[i].piece].y;
+                pv[max_depth-depth].fx = fx;
+                pv[max_depth-depth].fy = fy;
+                pv[max_depth-depth].tx = fx + possible[i].x;
+                pv[max_depth-depth].ty = fy + possible[i].y;
+                pv[max_depth-depth].transform = possible[i].transform;
             }
             if (beta <= alpha){
                 break;
@@ -1761,7 +1768,13 @@ float minimax_pv(Move *pv, short white, Piece *pieces, int grid[], Board *board,
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
             if (possible_best < beta){
                 beta = possible_best;
-                pv[max_depth-depth] = possible[i];
+                int fx = pieces[possible[i].piece].x;
+                int fy = pieces[possible[i].piece].y;
+                pv[max_depth-depth].fx = fx;
+                pv[max_depth-depth].fy = fy;
+                pv[max_depth-depth].tx = fx + possible[i].x;
+                pv[max_depth-depth].ty = fy + possible[i].y;
+                pv[max_depth-depth].transform = possible[i].transform;
             }
             if (beta <= alpha){
                 break;

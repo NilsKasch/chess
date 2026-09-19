@@ -25,4 +25,11 @@ typedef struct {
    char transform;
 }Move;
 
+// PV-only, position-independent move (fixes printing pv[1..] from root).
+typedef struct {
+   int fx,fy; // from square 0..7
+   int tx,ty; // to square 0..7
+   char transform;
+}Absolute_Move;
+
 #endif
