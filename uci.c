@@ -73,7 +73,7 @@ static void handle_position(const char *line, Piece *pieces, int *grid, Board *b
 
         char *token = strtok(moves_copy, " ");
         while (token) {
-            Move possible[138];
+            Move possible[218];
             int fill = 0;
             possible_moves(*white, pieces, grid, board, possible, &fill);
 

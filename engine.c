@@ -67,10 +67,12 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
             //black eaten
             target=grid[(pieces[move->piece].x+(move->x))+(pieces[move->piece].y+(move->y)-1)*8];
         }
-        undo_piece->txt = pieces[target].txt;
-        undo_piece->value = pieces[target].value;
-        undo_piece->x = target;
-        pieces[target].value=0;
+        if (target != 32){
+            undo_piece->txt = pieces[target].txt;
+            undo_piece->value = pieces[target].value;
+            undo_piece->x = target;
+            pieces[target].value=0;
+        }
     }
 
     // special rules
@@ -152,7 +154,7 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
 
 void undo_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo_piece){
     //Don't work with x=0 and y=0 move
-    if (undo_piece->value > 0){
+    if (undo_piece->value > 0 && undo_piece->x < 32){
         pieces[undo_piece->x].value = undo_piece->value;
         if (pieces[move->piece].y != pieces[undo_piece->x].y){ 
             // en passant         
@@ -593,8 +595,8 @@ int possible_to_castle_white_left(Piece pieces[], int grid[]){
         //Knight
         tmp.x= 2;
         tmp.y= 1;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y))){
             test_piece = grid[piece_x+tmp.x+tmp.y*8];
             if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -602,8 +604,8 @@ int possible_to_castle_white_left(Piece pieces[], int grid[]){
         }
         tmp.x= 1;
         tmp.y= 2;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y))){
             test_piece = grid[piece_x+tmp.x+tmp.y*8];
             if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -611,8 +613,8 @@ int possible_to_castle_white_left(Piece pieces[], int grid[]){
         }
         tmp.x= -1;
         tmp.y= 2;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y))){
             test_piece = grid[piece_x+tmp.x+tmp.y*8];
             if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -620,8 +622,8 @@ int possible_to_castle_white_left(Piece pieces[], int grid[]){
         }
         tmp.x= -2;
         tmp.y= 1;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y))){
             test_piece = grid[piece_x+tmp.x+tmp.y*8];
             if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -709,8 +711,8 @@ int possible_to_castle_white_right(Piece pieces[], int grid[]){
         //Knight
         tmp.x= 2;
         tmp.y= 1;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y))){
             test_piece = grid[piece_x+tmp.x+tmp.y*8];
             if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -718,8 +720,8 @@ int possible_to_castle_white_right(Piece pieces[], int grid[]){
         }
         tmp.x= 1;
         tmp.y= 2;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y))){
             test_piece = grid[piece_x+tmp.x+tmp.y*8];
             if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -727,8 +729,8 @@ int possible_to_castle_white_right(Piece pieces[], int grid[]){
         }
         tmp.x= -1;
         tmp.y= 2;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y))){
             test_piece = grid[piece_x+tmp.x+tmp.y*8];
             if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -736,8 +738,8 @@ int possible_to_castle_white_right(Piece pieces[], int grid[]){
         }
         tmp.x= -2;
         tmp.y= 1;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (tmp.y < 0) || (7 < tmp.y))){
             test_piece = grid[piece_x+tmp.x+tmp.y*8];
             if (( 16 <= test_piece && test_piece < 32 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -825,8 +827,8 @@ int possible_to_castle_black_left(Piece pieces[], int grid[]){
         //Knight
         tmp.x= 2;
         tmp.y= -1;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y))){
             test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
             if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -834,8 +836,8 @@ int possible_to_castle_black_left(Piece pieces[], int grid[]){
         }
         tmp.x= 1;
         tmp.y= -2;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y))){
             test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
             if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -843,8 +845,8 @@ int possible_to_castle_black_left(Piece pieces[], int grid[]){
         }
         tmp.x= -1;
         tmp.y= -2;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y))){
             test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
             if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -852,8 +854,8 @@ int possible_to_castle_black_left(Piece pieces[], int grid[]){
         }
         tmp.x= -2;
         tmp.y= -1;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y))){
             test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
             if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -941,8 +943,8 @@ int possible_to_castle_black_right(Piece pieces[], int grid[]){
         //Knight
         tmp.x= 2;
         tmp.y= -1;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y))){
             test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
             if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -950,8 +952,8 @@ int possible_to_castle_black_right(Piece pieces[], int grid[]){
         }
         tmp.x= 1;
         tmp.y= -2;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y))){
             test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
             if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -959,8 +961,8 @@ int possible_to_castle_black_right(Piece pieces[], int grid[]){
         }
         tmp.x= -1;
         tmp.y= -2;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y))){
             test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
             if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -968,8 +970,8 @@ int possible_to_castle_black_right(Piece pieces[], int grid[]){
         }
         tmp.x= -2;
         tmp.y= -1;
-        // if not on the board
-        if ((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y)){
+        // if on the board
+        if (!((piece_x + tmp.x < 0) || (7 < piece_x + tmp.x) || (7 + tmp.y < 0) || (7 < 7 + tmp.y))){
             test_piece = grid[piece_x+tmp.x+(7+tmp.y)*8];
             if (( 0 <= test_piece && test_piece < 16 ) && pieces[test_piece].txt == 'N'){
                 return 0;
@@ -1529,14 +1531,16 @@ void order_moves(Move possible[], int fill, Piece *pieces, int grid[], short *wh
         if (0 <= y_target && y_target < 8){
             x_target += 1;
             if (0 <= x_target && x_target < 8){
-                if ((pieces[grid[x_target + y_target * 8]].txt == 'p')){
+                int sq = grid[x_target + y_target * 8];
+                if (sq != 32 && (pieces[sq].txt == 'p')){
                     //penalize moving to a square protected by a pawn
                     scores[i] -= pieces[possible[i].piece].value;
                 }
             }
             x_target -= 2;
             if (0 <= x_target && x_target < 8){
-                if ((pieces[grid[x_target + y_target * 8]].txt == 'p')){
+                int sq = grid[x_target + y_target * 8];
+                if (sq != 32 && (pieces[sq].txt == 'p')){
                     //penalize moving to a square protected by a pawn
                     scores[i] -= pieces[possible[i].piece].value;
                 }
@@ -1584,9 +1588,11 @@ float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha,
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
+            unsigned int saved_ep = board->en_passant;
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1, count);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
+            board->en_passant = saved_ep;
             if (alpha < possible_best){
                 alpha = possible_best;
             }
@@ -1601,9 +1607,11 @@ float minimax(short white, Piece *pieces, int grid[], Board *board, float alpha,
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
+            unsigned int saved_ep = board->en_passant;
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1, count);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
+            board->en_passant = saved_ep;
             if (possible_best < beta){
                 beta = possible_best;
             }
@@ -1667,10 +1675,12 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
+            unsigned int saved_ep = board->en_passant;
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             //possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1) + (((double)rand() / RAND_MAX) - 0.5)/10;
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1, &count);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
+            board->en_passant = saved_ep;
             if (alpha < possible_best){
                 alpha = possible_best;
                 best = possible[i];
@@ -1686,10 +1696,12 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
+            unsigned int saved_ep = board->en_passant;
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             //possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1) + (((double)rand() / RAND_MAX) - 0.5)/10;
             possible_best = minimax(-white, pieces, grid, board, alpha, beta, depth - 1, &count);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
+            board->en_passant = saved_ep;
             if (possible_best < beta){
                 beta = possible_best;
                 best = possible[i];
@@ -1738,9 +1750,11 @@ float minimax_pv(Absolute_Move (*pv)[MAX_DEPTH], int pv_length[MAX_DEPTH], short
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
+            unsigned int saved_ep = board->en_passant;
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             possible_best = minimax_pv(pv, pv_length, -white, pieces, grid, board, alpha, beta, depth - 1, max_depth, count);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
+            board->en_passant = saved_ep;
             if (alpha < possible_best){
                 alpha = possible_best;
                 // Convert relative Move to absolute using restored (pre-move) position.
@@ -1770,9 +1784,11 @@ float minimax_pv(Absolute_Move (*pv)[MAX_DEPTH], int pv_length[MAX_DEPTH], short
         for (int i=0; i < fill; i++){
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
+            unsigned int saved_ep = board->en_passant;
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
             possible_best = minimax_pv(pv, pv_length, -white, pieces, grid, board, alpha, beta, depth - 1, max_depth, count);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
+            board->en_passant = saved_ep;
             if (possible_best < beta){
                 beta = possible_best;
                 // Convert relative Move to absolute using restored (pre-move) position.
