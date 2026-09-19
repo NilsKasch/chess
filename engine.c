@@ -1706,12 +1706,13 @@ Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int de
 }
 
 
-float minimax_pv(Absolute_Move *pv, short white, Piece *pieces, int grid[], Board *board, float alpha, float beta, int depth, int max_depth, int *count){
+float minimax_pv(Absolute_Move (*pv)[MAX_DEPTH], int pv_length[MAX_DEPTH], short white, Piece *pieces, int grid[], Board *board, float alpha, float beta, int depth, int max_depth, int *count){
     Move possible[218] = {};
     float possible_best;
     Piece undo_piece = {};
     int fill = 0;
     *count +=1;
+    int ply=max_depth-depth;
 
     if (depth == 0){
         return eval(pieces);
@@ -1723,7 +1724,8 @@ float minimax_pv(Absolute_Move *pv, short white, Piece *pieces, int grid[], Boar
 
     if (fill==0){
         // No legal move: terminate PV line (null = from == to).
-        pv[max_depth-depth].fx = 0; pv[max_depth-depth].fy = 0; pv[max_depth-depth].tx = 0; pv[max_depth-depth].ty = 0; pv[max_depth-depth].transform = 0;
+        pv[ply][0].fx = 0; pv[ply][0].fy = 0; pv[ply][0].tx = 0; pv[ply][0].ty = 0; pv[ply][0].transform = 0;
+        pv_length[ply]=0;
         if (not_defended(23-8*white, pieces, grid, &possible[0], &white)){
             //stalemate (possible[0] = no move)
             return 0;
@@ -1737,18 +1739,23 @@ float minimax_pv(Absolute_Move *pv, short white, Piece *pieces, int grid[], Boar
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
-            possible_best = minimax_pv(pv, -white, pieces, grid, board, alpha, beta, depth - 1, max_depth, count);
+            possible_best = minimax_pv(pv, pv_length, -white, pieces, grid, board, alpha, beta, depth - 1, max_depth, count);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
             if (alpha < possible_best){
                 alpha = possible_best;
                 // Convert relative Move to absolute using restored (pre-move) position.
                 int fx = pieces[possible[i].piece].x;
                 int fy = pieces[possible[i].piece].y;
-                pv[max_depth-depth].fx = fx;
-                pv[max_depth-depth].fy = fy;
-                pv[max_depth-depth].tx = fx + possible[i].x;
-                pv[max_depth-depth].ty = fy + possible[i].y;
-                pv[max_depth-depth].transform = possible[i].transform;
+                pv[ply][0].fx = fx;
+                pv[ply][0].fy = fy;
+                pv[ply][0].tx = fx + possible[i].x;
+                pv[ply][0].ty = fy + possible[i].y;
+                pv[ply][0].transform = possible[i].transform;
+                
+                for (int j=0; j<pv_length[ply+1]; j++){
+                    pv[ply][j + 1] = pv[ply+1][j];
+                }
+                pv_length[ply] = pv_length[ply + 1] + 1;
             }
             if (beta <= alpha){
                 break;
@@ -1764,17 +1771,23 @@ float minimax_pv(Absolute_Move *pv, short white, Piece *pieces, int grid[], Boar
             undo_piece.value=0;
             undo_piece.y=0; // used to stock if undo_move should restore castle rights
             apply_move(pieces,grid,board,&possible[i], &undo_piece);
-            possible_best = minimax_pv(pv, -white, pieces, grid, board, alpha, beta, depth - 1, max_depth, count);
+            possible_best = minimax_pv(pv, pv_length, -white, pieces, grid, board, alpha, beta, depth - 1, max_depth, count);
             undo_move(pieces,grid,board,&possible[i], &undo_piece);
             if (possible_best < beta){
                 beta = possible_best;
+                // Convert relative Move to absolute using restored (pre-move) position.
                 int fx = pieces[possible[i].piece].x;
                 int fy = pieces[possible[i].piece].y;
-                pv[max_depth-depth].fx = fx;
-                pv[max_depth-depth].fy = fy;
-                pv[max_depth-depth].tx = fx + possible[i].x;
-                pv[max_depth-depth].ty = fy + possible[i].y;
-                pv[max_depth-depth].transform = possible[i].transform;
+                pv[ply][0].fx = fx;
+                pv[ply][0].fy = fy;
+                pv[ply][0].tx = fx + possible[i].x;
+                pv[ply][0].ty = fy + possible[i].y;
+                pv[ply][0].transform = possible[i].transform;
+                
+                for (int j=0; j<pv_length[ply+1]; j++){
+                    pv[ply][j + 1] = pv[ply+1][j];
+                }
+                pv_length[ply] = pv_length[ply + 1] + 1;
             }
             if (beta <= alpha){
                 break;

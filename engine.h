@@ -9,6 +9,6 @@ void apply_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo
 void undo_move(Piece *pieces, int grid[], Board *board, Move *move, Piece *undo_piece);
 void possible_moves(short white, Piece *pieces, int grid[], Board *board, Move possible[], int *fill);
 Move rnd_best_move(short white, Piece *pieces, int grid[], Board *board,  int depth);
-float minimax_pv(Absolute_Move *pv, short white, Piece *pieces, int grid[], Board *board, float alpha, float beta, int depth, int max_depth, int *count);
+float minimax_pv(Absolute_Move (*pv)[MAX_DEPTH], int pv_length[MAX_DEPTH], short white, Piece *pieces, int grid[], Board *board, float alpha, float beta, int depth, int max_depth, int *count);
 
 #endif

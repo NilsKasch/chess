@@ -101,7 +101,7 @@ static void handle_position(const char *line, Piece *pieces, int *grid, Board *b
 }
 
 //TODO move it to search.c in the future
-void iterative_deepen(short white, Piece *pieces, int grid[], Board *board, int depth, Absolute_Move *pv){
+void iterative_deepen(short white, Piece *pieces, int grid[], Board *board, int depth, Absolute_Move (*pv)[MAX_DEPTH], int pv_length[]){
     int max_depth = depth;
     int d=1;
     int count=0;
@@ -113,11 +113,11 @@ void iterative_deepen(short white, Piece *pieces, int grid[], Board *board, int 
 
     while (d<=max_depth)
     {
-        best_value = minimax_pv(pv, white, pieces, grid, board, alpha, beta, d, d, &count); //TODO change shuffel not every time
+        memset(pv_length, 0, MAX_DEPTH*sizeof(int));
+        best_value = minimax_pv(pv, pv_length, white, pieces, grid, board, alpha, beta, d, d, &count); //TODO change shuffel not every time
         printf("info depth %d nodes %d score cp %d pv", d, count, (int)(best_value * 10 * white));
-        for (int i = 0; i < d; i++) {
-            if (pv[i].fx == pv[i].tx && pv[i].fy == pv[i].ty) break; // null terminator
-            abs_move_to_uci(&pv[i], uci_buf);
+        for (int i = 0; i < pv_length[0]; i++) {
+            abs_move_to_uci(&pv[0][i], uci_buf);
             printf(" %s", uci_buf);
         }
         printf("\n");
@@ -137,10 +137,11 @@ static void handle_go(const char *line, short white, Piece *pieces, int *grid, B
         return;
     }
 
-    Absolute_Move pv[100] = {};
-    iterative_deepen(white, pieces, grid, board, depth, pv);
+    Absolute_Move pv[MAX_DEPTH][MAX_DEPTH] = {};
+    int  pv_length[MAX_DEPTH];
+    iterative_deepen(white, pieces, grid, board, depth, pv, pv_length);
     //Move best = rnd_best_move(white, pieces, grid, board, depth);
-    Absolute_Move best = pv[0];
+    Absolute_Move best = pv[0][0];
 
 
     if (best.fx == best.tx && best.fy == best.ty) {

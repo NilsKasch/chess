@@ -6,6 +6,8 @@
 #define BLACK_CASLTE_LEFT  (1 << 2)    // 0100
 #define BLACK_CASLTE_RIGHT  (1 << 3)   // 1000
 
+#define MAX_DEPTH 128
+
 typedef struct
 {
    //Piece pieces[32];
